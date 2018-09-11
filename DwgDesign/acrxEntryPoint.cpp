@@ -168,6 +168,7 @@ public:
 
 	static void Cmds_JXT()
 	{
+		//接线图生成功能
 		CAcModuleResourceOverride rs;
 		if (pDlg == NULL)
 		{
@@ -206,6 +207,7 @@ public:
 
 	static void Cmds_DLT()
 	{
+		//电缆图
 		CAcModuleResourceOverride rs;
 		CDlgPpsj dlg;
 		dlg.DoModal();
