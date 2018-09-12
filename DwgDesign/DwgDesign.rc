@@ -433,6 +433,22 @@ BEGIN
     LTEXT           "右键单击放置.",IDC_STATIC,1,11,81,8
 END
 
+IDD_DLGPRORESS DIALOGEX 0, 0, 215, 50
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "进度显示"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_PROGRESS1,"msctls_progress32",WS_BORDER,14,18,188,14
+END
+
+IDD_PRORESS DIALOGEX 0, 0, 311, 48
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "进度显示"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_PROGRESS1,"msctls_progress32",WS_BORDER,7,17,297,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -591,6 +607,22 @@ BEGIN
         RIGHTMARGIN, 82
         TOPMARGIN, 2
         BOTTOMMARGIN, 202
+    END
+
+    IDD_DLGPRORESS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 208
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 43
+    END
+
+    IDD_PRORESS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 304
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 41
     END
 END
 #endif    // APSTUDIO_INVOKED

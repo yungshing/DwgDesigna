@@ -277,6 +277,7 @@
     <ClCompile Include="DlgMain.cpp" />
     <ClCompile Include="DlgPpsj.cpp" />
     <ClCompile Include="DlgPrompt.cpp" />
+    <ClCompile Include="DlgProresstest.cpp" />
     <ClCompile Include="DlgSelectItem.cpp" />
     <ClCompile Include="DlgViewSet.cpp" />
     <ClCompile Include="DlgWeihao.cpp" />
@@ -330,6 +331,7 @@
     <ClInclude Include="DlgMain.h" />
     <ClInclude Include="DlgPpsj.h" />
     <ClInclude Include="DlgPrompt.h" />
+    <ClInclude Include="DlgProresstest.h" />
     <ClInclude Include="DlgSelectItem.h" />
     <ClInclude Include="DlgViewSet.h" />
     <ClInclude Include="DlgWeihao.h" />
@@ -349,6 +351,10 @@
     <ResourceCompile Include="DwgDesign.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\DwgDesign\Support\LD.bmp" />
+    <None Include="..\..\..\DwgDesign\Support\LU.bmp" />
+    <None Include="..\..\..\DwgDesign\Support\RD.bmp" />
+    <None Include="..\..\..\DwgDesign\Support\RU.bmp" />
     <None Include="..\Support\LD.bmp" />
     <None Include="..\Support\LD.png" />
     <None Include="..\Support\LU.bmp" />

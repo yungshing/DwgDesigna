@@ -39,11 +39,49 @@
 #include "DlgLhxx.h"
 #include "WordEdit.h"
 #include <atlbase.h>
+#include "DlgProresstest.h"
 
 extern CDlgMain *pDlg;
 extern CDlgViewSet *pSetViewDlg;
 extern CDlgAccessory *pDlgAccessory;
 extern CDlgSelectItem *pDlgSelect;
+
+CDlgProresstest *prodlg = NULL;
+bool strdlg()
+{
+	bool b;
+	CAcModuleResourceOverride rs;
+	HWND hwndAcad = adsw_acadMainWnd();
+	CWnd *pWnd = CWnd::FromHandle(hwndAcad);
+	if (prodlg==NULL)
+	{
+		prodlg = new CDlgProresstest(pWnd);
+		b=prodlg->Create(pWnd);
+		
+		if (!b)
+		{
+			return b;
+		}
+		prodlg->ShowWindow(SW_NORMAL);
+	}
+	return true;
+}
+bool deletedlg()
+{
+	if (prodlg==NULL)
+	{
+		return true;
+	}
+	else
+	{
+		prodlg->DestroyWindow();
+	}
+	
+	delete prodlg;
+	prodlg = NULL;
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 #define szRDS _RXST("")
 
@@ -105,6 +143,16 @@ public:
 
 	static void Cmds_Test()
 	{
+		CAcModuleResourceOverride rs;
+		strdlg();
+		for (int i = 0; i < 10;i++)
+		{
+			Sleep(500);
+			prodlg->setpos(i*10);
+		}
+		deletedlg();
+		
+
 // 		CAcModuleResourceOverride rs;
 // 		CDlgSelectItem dlg(100);
 // 		dlg.DoModal();

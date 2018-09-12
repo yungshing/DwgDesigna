@@ -156,6 +156,9 @@
     <ClCompile Include="DlgSelectItem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DlgProresstest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DocData.h">
@@ -296,6 +299,9 @@
     <ClInclude Include="DlgSelectItem.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DlgProresstest.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DwgDesign.rc">
@@ -328,6 +334,18 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="..\Support\RU.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\..\..\DwgDesign\Support\LU.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\..\..\DwgDesign\Support\RD.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\..\..\DwgDesign\Support\RU.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\..\..\DwgDesign\Support\LD.bmp">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>

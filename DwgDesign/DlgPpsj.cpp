@@ -5,9 +5,13 @@
 #include "DlgPpsj.h"
 #include "afxdialogex.h"
 #include <CPPAdapter.h>
+#include "DlgProresstest.h"
 
 
 // CDlgPpsj 对话框
+extern bool strdlg();
+extern bool deletedlg();
+extern CDlgProresstest *prodlg;
 
 IMPLEMENT_DYNAMIC(CDlgPpsj, CDialogEx)
 
@@ -158,12 +162,25 @@ void CDlgPpsj::OnBnClickedBtnSelect()
 		AfxMessageBox(_T("excel文件打开存在问题,请检查！"));
 		return;
 	}
+	strdlg();
+	Sleep(100);
+	if (prodlg!=NULL)
+	{
+		prodlg->SetWindowText(_T("检索excel信息"));
+	}
+	
     //检测excel信息完整
 	if (!CheckExcel())
-	{
+	{			
+		prodlg->setpos(100);
+		Sleep(100);
+		deletedlg();
 		AfxMessageBox(_T("excel中信息存在问题，请查看日志文件!"));
 		return;
-	}
+	}	
+	prodlg->setpos(20);
+	Sleep(100);
+	
 	UpdateData(FALSE);
 	GetDlInfo();//获取电缆连接器信息以及电缆规格信息
 	CString sDlName = GetDlType(m_vecLeft.size(), m_vecRight.size());//根据两端信息确定电缆名称
@@ -172,9 +189,14 @@ void CDlgPpsj::OnBnClickedBtnSelect()
 	m_cmb_Dllx.SetCurSel(m_cmb_Dllx.FindString(0, m_sDllx));
 	FillListLjq();
 	FillListDlgg();
-
+	prodlg->setpos(95);
+	Sleep(100);
+	
 	UpdateData(FALSE);
 	OnCbnSelchangeCmbDllj();
+	prodlg->setpos(100);
+	Sleep(100);
+	deletedlg();
 	AfxMessageBox(_T("打开及检测完毕"));
 	return;
 }

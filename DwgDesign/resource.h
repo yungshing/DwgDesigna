@@ -93,7 +93,10 @@
 #define IDR_MENU4                       151
 #define IDC_LIST_RESULT                 152
 #define IDD_DLG_ITEMSELECT              152
+#define IDD_DLGPRORESS                  153
 #define IDC_RADIO_YCL                   154
+#define IDD_PR                          154
+#define IDD_PRORESS                     154
 #define IDC_RADIO_WCL                   155
 #define IDC_RADIO_ZH                    156
 #define IDC_BTN_MXB                     157
@@ -170,7 +173,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        153
+#define _APS_NEXT_RESOURCE_VALUE        155
 #define _APS_NEXT_COMMAND_VALUE         32776
 #define _APS_NEXT_CONTROL_VALUE         214
 #define _APS_NEXT_SYMED_VALUE           102
