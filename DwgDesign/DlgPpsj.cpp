@@ -1273,7 +1273,7 @@ void CDlgPpsj::OnBnClickedBtnSj1()
 // 	size_t sz = 0;
 // 	wcstombs_s(&sz, pStr, strsize, sTemp, _TRUNCATE);
 // 	int n = atoi((const char*)pStr);
-// 	system(pStr);
+// 	system(pStr);	
 	wchar_t excel_file[MAX_PATH];
 	glaway::LowFrequencyCableDesign(m_hWnd, excel_file);
 }
@@ -1289,6 +1289,7 @@ void CDlgPpsj::OnBnClickedBtnSj2()
 // 	wcstombs_s(&sz, pStr, strsize, sTemp, _TRUNCATE);
 // 	int n = atoi((const char*)pStr);
 // 	system(pStr);
+
 	wchar_t excel_file[MAX_PATH];
 	glaway::LowFrequencyBranchCableDesign(m_hWnd, excel_file);
 }
@@ -1304,6 +1305,7 @@ void CDlgPpsj::OnBnClickedBtnSj3()
 // 	wcstombs_s(&sz, pStr, strsize, sTemp, _TRUNCATE);
 // 	int n = atoi((const char*)pStr);
 // 	system(pStr);
+
 	wchar_t excel_file[MAX_PATH];
 	glaway::SingleCableDesign(m_hWnd, excel_file);
 }
@@ -1319,8 +1321,9 @@ void CDlgPpsj::OnBnClickedBtnSj4()
 // 	wcstombs_s(&sz, pStr, strsize, sTemp, _TRUNCATE);
 // 	int n = atoi((const char*)pStr);
 // 	system(pStr);
+
 	wchar_t excel_file[MAX_PATH];
-	glaway::BatchCableDesign(m_hWnd, excel_file);
+	glaway::MultipleCableDesign(m_hWnd, excel_file);
 }
 
 

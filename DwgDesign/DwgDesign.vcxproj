@@ -46,7 +46,7 @@
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>false</CLRSupport>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v90</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -83,7 +83,7 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)x64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)xR64\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</LinkIncremental>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
@@ -103,12 +103,17 @@
     <IncludePath>../CPPAdapter\include;../SDK\inc;../SDK\inc-x64;$(IncludePath)</IncludePath>
     <LibraryPath>../SDK\lib-x64;../CPPAdapter\lib64;$(LibraryPath)</LibraryPath>
     <TargetExt>.arx</TargetExt>
-    <TargetName>$(ProjectName)-X64</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>../CPPAdapter\include;../SDK\inc;../SDK\inc-win32;$(IncludePath)</IncludePath>
     <LibraryPath>../CPPAdapter\lib;../SDK\lib-win32;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)-X32</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetExt>.arx</TargetExt>
+    <IncludePath>../CPPAdapter\include;../SDK\inc;../SDK\inc-x64;$(IncludePath)</IncludePath>
+    <LibraryPath>../CPPAdapter\lib64;../SDK\lib-x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -131,7 +136,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <OutputFile>$(OutDir)DwgDesign-X32.arx</OutputFile>
+      <OutputFile>$(OutDir)DwgDesign.arx</OutputFile>
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)DwgDesign.pdb</ProgramDatabaseFile>
@@ -200,7 +205,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <OutputFile>$(OutDir)DwgDesign-X64.arx</OutputFile>
+      <OutputFile>$(OutDir)DwgDesign.arx</OutputFile>
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)DwgDesign.pdb</ProgramDatabaseFile>
@@ -242,6 +247,7 @@
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)DwgDesign.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalDependencies>CPPAdapter.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
