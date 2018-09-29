@@ -147,6 +147,9 @@
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /S /Y "$(SolutionDir)w32" "$(SolutionDir)../../GR-ICD\trunk\ZwForICDX32\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -216,6 +219,9 @@
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>CPPAdapter.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /S /Y "$(SolutionDir)x64" "$(SolutionDir)../../GR-ICD\trunk\ZwForICDX64\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

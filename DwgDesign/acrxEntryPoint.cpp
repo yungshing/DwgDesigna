@@ -143,15 +143,12 @@ public:
 
 	static void Cmds_Test()
 	{
-		CAcModuleResourceOverride rs;
-		strdlg();
-		for (int i = 0; i < 10;i++)
-		{
-			Sleep(500);
-			prodlg->setpos(i*10);
-		}
-		deletedlg();
-		
+		AcDbEntity *pEnt = NULL;
+		AcGePoint3d pickpoint;
+		CSelectUtil::PromptSelectEntity(_T("xuanze"), AcDbBlockReference::desc(), pEnt, pickpoint);
+		AcDbObjectId idTemp = pEnt->id();
+		pEnt->close();
+		MirrorBlock(idTemp);
 
 // 		CAcModuleResourceOverride rs;
 // 		CDlgSelectItem dlg(100);

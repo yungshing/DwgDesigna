@@ -6,6 +6,7 @@
 #include "rwExcel.h"
 #include "DlgPrompt.h"
 #include "Common/Tools.h"
+#include "DlgProresstest.h"
 
 // CDlgMain 对话框
 
@@ -26,6 +27,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	CToolTipCtrl m_stat;
+
 	CAcUiTab m_tab;//tab容器
 	CDlgDiscern m_dlgDiscern;//接线识别对话框
 	CDlgWeihao m_dlgWeihao;//位号生成对话框
@@ -46,6 +49,8 @@ public:
 	CAcUiComboBox m_cmb_View;//视图
 	CString m_sCurrentView;//当前视图字符串
 	AcDbObjectIdArray m_ViewIdArr;
+
+	CString m_sManualWeihao;
 
 	AcDbObjectIdArray m_ErrorId;
 	std::vector<Adesk::UInt16> m_vecColor;
@@ -234,4 +239,5 @@ public:
 	afx_msg void OnBnClickedBtnHightlight();
 	afx_msg void OnBnClickedBtnUnhightlight();
 	afx_msg void OnBnClickedBtnMapcheck();
+	afx_msg void OnBnClickedBtnManualinsert();
 };

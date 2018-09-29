@@ -1367,3 +1367,35 @@ std::vector<CString> GetTextVal(CString sTextPath)
 	infile.close();
 	return vecRet;
 }
+
+AcGePoint3d offsetPoint(AcGePoint3d pt, double x, double y)
+{
+	return AcGePoint3d(pt.x + x, pt.y + y, pt.z);
+}
+
+AcDbObjectId MirrorBlock(AcDbObjectId idBlock)
+{
+	AcDbEntity *pEnt = NULL;
+	Acad::ErrorStatus es;
+	es = acdbOpenAcDbEntity(pEnt, idBlock, AcDb::kForWrite);
+	if (es!=eOk)
+	{
+		return idBlock;
+	}
+	if (!pEnt->isKindOf(AcDbBlockReference::desc()))
+	{
+		pEnt->close();
+		return idBlock;
+	}
+	AcDbBlockReference *pRef = static_cast<AcDbBlockReference*>(pEnt);
+	AcGePoint3d ptPos=pRef->position();
+	AcGePoint3d ptMir1, ptMir2;
+	ptMir1 = offsetPoint(ptPos, 0, 50);
+	ptMir2 = offsetPoint(ptPos, 0, -50);
+	AcGeLine3d line(ptMir1, ptMir2);
+	AcGeMatrix3d mat;
+	mat.setToMirroring(line);
+	pEnt->transformBy(mat);
+	pEnt->close();
+	return idBlock;
+}

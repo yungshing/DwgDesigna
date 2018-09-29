@@ -1015,7 +1015,9 @@ BOOL CDlgPpsj::CreatDlYzb(CString sYzbName,BOOL bLh,AcGePoint3d ptInsert)
 	AcDbObjectId idDef=CBlockUtil::CopyBlockDefFromOtherDwg(GetDwgPath(), sYzbName);
 	if (idDef==AcDbObjectId::kNull)
 	{
-		AfxMessageBox(_T("Î´ÕÒµ½Ó¡×Ö±íÍ¼¿é"));
+		CString sPrompt;
+		sPrompt.Format(_T("Î´ÕÒµ½Ó¡×Ö±íÍ¼¿é:%s"), sYzbName);
+		AfxMessageBox(sPrompt);
 		return FALSE;
 	}
 	AcDbObjectId idBlock=CBlockUtil::InsertBlockRefWithAttribute(idDef, AcGePoint3d(ptInsert.x+30,ptInsert.y -72, 0));
@@ -1273,7 +1275,8 @@ void CDlgPpsj::OnBnClickedBtnSj1()
 // 	size_t sz = 0;
 // 	wcstombs_s(&sz, pStr, strsize, sTemp, _TRUNCATE);
 // 	int n = atoi((const char*)pStr);
-// 	system(pStr);	
+// 	system(pStr);
+
 	wchar_t excel_file[MAX_PATH];
 	glaway::LowFrequencyCableDesign(m_hWnd, excel_file);
 }

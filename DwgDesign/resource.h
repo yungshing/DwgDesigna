@@ -161,6 +161,8 @@
 #define IDC_BUTTON3                     212
 #define IDC_TREE                        213
 #define IDC_TREE_SELECT                 213
+#define IDC_EDIT_MANUALWEIHAO           214
+#define IDC_BTN_MANUALINSERT            215
 #define ID_32769                        32769
 #define ID_32770                        32770
 #define ID_32771                        32771
@@ -175,7 +177,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        155
 #define _APS_NEXT_COMMAND_VALUE         32776
-#define _APS_NEXT_CONTROL_VALUE         214
+#define _APS_NEXT_CONTROL_VALUE         216
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

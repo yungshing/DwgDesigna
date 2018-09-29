@@ -5,6 +5,10 @@
 #include "DlgMain.h"
 #include "afxdialogex.h"
 
+extern bool strdlg();
+extern bool deletedlg();
+extern CDlgProresstest *prodlg;
+
 CDlgMain *pDlg = NULL;
 
 // CDlgMain 对话框
@@ -39,6 +43,8 @@ void CDlgMain::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_RADIO_ZH, m_bZh);
 	DDX_Control(pDX, IDC_CMB_VIEW, m_cmb_View);
 	DDX_Text(pDX, IDC_EDIT_SEARCH, m_sSearch);
+
+	DDX_Text(pDX, IDC_EDIT_MANUALWEIHAO, m_sManualWeihao);
 }
 
 BEGIN_MESSAGE_MAP(CDlgMain, CAcUiTabMainDialog)
@@ -68,6 +74,7 @@ BEGIN_MESSAGE_MAP(CDlgMain, CAcUiTabMainDialog)
 	ON_BN_CLICKED(IDC_BTN_HIGHTLIGHT, &CDlgMain::OnBnClickedBtnHightlight)
 	ON_BN_CLICKED(IDC_BTN_UNHIGHTLIGHT, &CDlgMain::OnBnClickedBtnUnhightlight)
 	ON_BN_CLICKED(IDC_BTN_MAPCHECK, &CDlgMain::OnBnClickedBtnMapcheck)
+	ON_BN_CLICKED(IDC_BTN_MANUALINSERT, &CDlgMain::OnBnClickedBtnManualinsert)
 END_MESSAGE_MAP()
 
 
@@ -92,6 +99,21 @@ BOOL CDlgMain::OnInitDialog()
 	CString sViewTemp;
 	ini.GetValueOfKey(_T("DL"), _T("VIEW"), sViewTemp);
 	FillCombo(m_cmb_View, sViewTemp, _T(","));
+
+	//按钮悬停提示
+	m_stat.Create(this);
+	m_stat.AddTool(GetDlgItem(IDC_BTN_HIGHTLIGHT), _T("高亮所选视图"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_UNHIGHTLIGHT), _T("取消高亮所选视图"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_CHECKDWG), _T("检查非图块图形和已放置的位号标识,非图块:红色,位号标识:黄色"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_RESTOREDWG), _T("取消加亮"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_MAPCHECK), _T("检查电气特性表中存在但不存在中间映射表的位号"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_TABTOMARK), _T("识别电气特性表中的位号，并显示在下方位号列表中"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_AUTOWH), _T("在图纸中自动生成图块对应的位号标识"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_CHECKWH), _T("在图纸中删除位号后,需刷新位号识别信息"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_REFLIST), _T("识别接线表中的连接关系，并显示在下方连接关系列表中"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_CHECKINFO), _T("在图纸中删除连线后，需检测连接信息"));
+
+	m_stat.Activate(TRUE);
 
 	UpdateData(FALSE);
 	// TODO:  在此添加额外的初始化
@@ -1108,12 +1130,29 @@ void CDlgMain::OnBnClickedBtnReflist()
 		acutPrintf(_T("\n正在进行选择操作,请选择图块或者esc退出选择。"));
 		return;
 	}
+	//进度条
+	strdlg();
+	Sleep(100);
+	if (prodlg != NULL)
+	{
+		prodlg->SetWindowText(_T("连接识别"));
+	}
+	//进度
+	prodlg->setpos(20);
+	Sleep(100);
 	m_dlgDiscern.RefreshList(m_sJxb);
+	//进度
+	prodlg->setpos(50);
+	Sleep(100);
+
 	UpdateData(FALSE);
 	m_bShowPrompt = FALSE;
 	OnBnClickedBtnCheckinfo();
 	m_bShowPrompt = TRUE;
-	AfxMessageBox(_T("识别完成"));
+	//进度
+	prodlg->setpos(100);
+	Sleep(100);
+	deletedlg();
 }
 
 void CDlgMain::OnBnClickedBtnCheckinfo()
@@ -1155,10 +1194,26 @@ void CDlgMain::OnBnClickedBtnTabtomark()
 		AfxMessageBox(_T("excel文件打开存在问题,请检查！"));
 		return;
 	}
+	//进度条
+	strdlg();
+	Sleep(100);
+	if (prodlg!=NULL)
+	{
+		prodlg->SetWindowText(_T("位号识别"));
+	}
+
 	BOOL b1 = GetMapTab();
+	//进度
+	prodlg->setpos(20);
+	Sleep(100);
+
 	m_dlgDiscern.m_vecWeihao.clear();
 	m_vecInfo.clear();
  	BOOL b  = FindInfo();//查找出excel中物资代码对应的名称
+	//进度
+	prodlg->setpos(50);
+	Sleep(100);
+
 	m_dlgWeihao.m_vecListinfo.clear();
 // 	GetAllDwgTextAndPosition();//从图纸中获取所有的名字和对应点
 // 	CreatMarkToText(3);//根据位置生成标记
@@ -1169,6 +1224,10 @@ void CDlgMain::OnBnClickedBtnTabtomark()
 		return;
 	}
 	m_dlgWeihao.RefreshList(m_sDqtx,m_mapZjys);
+	//进度
+	prodlg->setpos(70);
+	Sleep(100);
+
 	CString sExcelPath;
 	bool bShowExcel = false;
 	bShowExcel=m_dlgWeihao.ExportLog(sExcelPath);
@@ -1183,11 +1242,20 @@ void CDlgMain::OnBnClickedBtnTabtomark()
 			AfxMessageBox(_T("包含不可忽略掉的错误请参考错误日志修改以后再导入"));
 		}
 	}
+
+	//进度
+	prodlg->setpos(90);
+	Sleep(100);
+
 	UpdateData(FALSE);
 	m_bShowPrompt = FALSE;
 	OnBnClickedBtnCheckwh();
 	m_bShowPrompt = TRUE;
-	AfxMessageBox(_T("识别完成"));
+	
+	//进度
+	prodlg->setpos(100);
+	Sleep(100);
+	deletedlg();
 
 	if (bShowExcel)
 	{
@@ -1347,6 +1415,8 @@ void CDlgMain::OnBnClickedBtnCheckwh()
 BOOL CDlgMain::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: 在此添加专用代码和/或调用基类
+	m_stat.RelayEvent(pMsg);
+
 	if (pMsg->message==WM_KEYDOWN&&pMsg->wParam==VK_ESCAPE)
 	{
 		return TRUE;
@@ -1705,10 +1775,26 @@ void CDlgMain::OnBnClickedBtnCheckdwg()
 		}
 		if (!pEnt->isKindOf(AcDbBlockReference::desc()))
 		{
-			m_vecColor.push_back(pEnt->colorIndex());//存储颜色
-			m_ErrorId.append(idTemp);//存储Id
-			pEnt->setColorIndex(1);//设置颜色
-			iMark++;
+			if (!pEnt->isKindOf(AcDbText::desc()))
+			{
+				m_vecColor.push_back(pEnt->colorIndex());//存储颜色
+				m_ErrorId.append(idTemp);//存储Id
+				pEnt->setColorIndex(1);//设置颜色
+				iMark++;
+			}
+			else
+			{
+				CString sTag;
+				CDwgDatabaseUtil::getXdata(_T("标记"), sTag, pEnt);
+				if (sTag!=_T(""))
+				{
+					m_vecColor.push_back(pEnt->colorIndex());
+					m_ErrorId.append(idTemp);
+					pEnt->setColorIndex(2);
+					iMark++;
+				}
+			}
+			
 		}
 		pEnt->close();
 	}
@@ -1720,7 +1806,7 @@ void CDlgMain::OnBnClickedBtnCheckdwg()
 		CString sMark;
 		sMark.Format(_T("%d"), iMark);
 		CString sPrompt;
-		sPrompt = _T("发现: ") + sMark + _T(" 个不是图块的实体,并修改颜色为红色.");
+		sPrompt = _T("发现: ") + sMark + _T(" 个不是图块的实体,并将块修改颜色为红色,位号标识修改为黄色.");
 		AfxMessageBox(sPrompt);
 	}
 	this->GetParent()->SetFocus();
@@ -2000,4 +2086,37 @@ void CDlgMain::OnBnClickedBtnMapcheck()
 		AfxMessageBox(_T("映射校验通过，未发现问题."));
 	}
 	return;
+}
+
+
+void CDlgMain::OnBnClickedBtnManualinsert()
+{
+	// TODO:  在此添加控件通知处理程序代码
+	CString sView, sWeihao;
+	UpdateData(TRUE);
+	GetDlgItemText(IDC_CMB_VIEW, sView);
+	if (m_sManualWeihao==_T("")||sView==_T(""))
+	{
+		AfxMessageBox(_T("位号及视图信息不能为空"));
+		return;
+	}
+	acDocManager->lockDocument(curDoc());
+	AcGePoint3d ptInsert;
+	bool b=CGetInputUtil::GetPoint(_T("\n选择位号插入点"), ptInsert);
+	if (!b)
+	{
+		acDocManager->unlockDocument(curDoc());
+		return;
+	}
+	AcDbText *pText = new AcDbText(ptInsert, m_sManualWeihao, AcDbObjectId::kNull, 3);
+	pText->setHorizontalMode(AcDb::kTextCenter);
+	pText->setVerticalMode(AcDb::kTextVertMid);
+	pText->setAlignmentPoint(ptInsert);
+	CDwgDatabaseUtil::SetXdata(_T("标记"), m_sManualWeihao, pText);
+	CDwgDatabaseUtil::SetXdata(_T("物资代码"), _T(""), pText);
+	CDwgDatabaseUtil::SetXdata(_T("视图"), sView, pText);
+	CDwgDatabaseUtil::PostToModelSpace(pText);
+	acDocManager->unlockDocument(curDoc());
+	acTransactionManagerPtr()->flushGraphics();
+	acedUpdateDisplay();
 }

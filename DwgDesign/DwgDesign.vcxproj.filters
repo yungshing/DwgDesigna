@@ -16,6 +16,45 @@
     <Filter Include="Common">
       <UniqueIdentifier>{27b745df-b478-4874-9b9a-c9f63230fd88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="拖动实现">
+      <UniqueIdentifier>{c50a72bf-4a0b-4726-98c6-5fb9e3d62b4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="电缆图匹配设计">
+      <UniqueIdentifier>{10e28bfe-d43b-4fe1-97a1-948bcf28331e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="接线图界面实现">
+      <UniqueIdentifier>{cb28a487-850d-4639-80ce-9f8dac42a499}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="树控件">
+      <UniqueIdentifier>{10e6582b-7df5-4843-bffd-ee2a2f38148b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="技术文字">
+      <UniqueIdentifier>{5e2ed5db-d8d6-45cb-8f04-e24ad8e208a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="前期弹出界面及功能测试%28后期移除%29">
+      <UniqueIdentifier>{48ee9ff9-9da0-414c-855d-c117453062ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="错误提示对话框">
+      <UniqueIdentifier>{bafcd56f-350d-4679-8445-a0e893cc6b04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="双击响应">
+      <UniqueIdentifier>{6b603e5d-29db-4068-a64d-26c7bd4435c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="图框">
+      <UniqueIdentifier>{55096f87-cf68-4d8f-bd60-383e7926c7e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="进度条">
+      <UniqueIdentifier>{df2479a1-cabd-41e7-a7d6-fa12034ea3c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="修改图块">
+      <UniqueIdentifier>{6f900301-032c-424f-afe8-5febfccf3f61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="控件预览dwg">
+      <UniqueIdentifier>{a19e2909-7229-4968-8903-c92411b3ce2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="excel操作类">
+      <UniqueIdentifier>{b9316e91-87e8-44a4-91cc-14149c3afec9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="acrxEntryPoint.cpp">
@@ -72,92 +111,92 @@
     <ClCompile Include="Common\Tools.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="excel9.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="rwExcel.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgMain.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgDiscern.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlDwg.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DoubleClick.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="EditBlockDlg.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="EditDlDlg.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="fcGsPreviewCtrl.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgAutoCreat.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgWeihao.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgPpsj.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgLjq.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgDlgg.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgDlfj.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgAccessory.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgFrame.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="BlockJig.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DirTreeCtrl.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgJswz.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SortStringArray.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgPrompt.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgHbTab.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgLhxx.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WordEdit.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgViewSet.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Common\LineUtil.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="DlgSelectItem.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="BlockJig.cpp">
+      <Filter>拖动实现</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgDiscern.cpp">
+      <Filter>接线图界面实现</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgMain.cpp">
+      <Filter>接线图界面实现</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgWeihao.cpp">
+      <Filter>接线图界面实现</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgPpsj.cpp">
+      <Filter>电缆图匹配设计</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgAccessory.cpp">
+      <Filter>电缆图匹配设计</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgDlgg.cpp">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgDlfj.cpp">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClCompile>
+    <ClCompile Include="DlDwg.cpp">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClCompile>
+    <ClCompile Include="DirTreeCtrl.cpp">
+      <Filter>树控件</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgViewSet.cpp">
+      <Filter>接线图界面实现</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgJswz.cpp">
+      <Filter>技术文字</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgAutoCreat.cpp">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgLjq.cpp">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgPrompt.cpp">
+      <Filter>错误提示对话框</Filter>
+    </ClCompile>
+    <ClCompile Include="DoubleClick.cpp">
+      <Filter>双击响应</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgFrame.cpp">
+      <Filter>图框</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgHbTab.cpp">
+      <Filter>电缆图匹配设计</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgLhxx.cpp">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
     </ClCompile>
     <ClCompile Include="DlgProresstest.cpp">
-      <Filter>源文件</Filter>
+      <Filter>进度条</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgSelectItem.cpp">
+      <Filter>接线图界面实现</Filter>
+    </ClCompile>
+    <ClCompile Include="EditBlockDlg.cpp">
+      <Filter>修改图块</Filter>
+    </ClCompile>
+    <ClCompile Include="EditDlDlg.cpp">
+      <Filter>修改图块</Filter>
+    </ClCompile>
+    <ClCompile Include="fcGsPreviewCtrl.cpp">
+      <Filter>控件预览dwg</Filter>
+    </ClCompile>
+    <ClCompile Include="excel9.cpp">
+      <Filter>excel操作类</Filter>
+    </ClCompile>
+    <ClCompile Include="rwExcel.cpp">
+      <Filter>excel操作类</Filter>
+    </ClCompile>
+    <ClCompile Include="SortStringArray.cpp">
+      <Filter>技术文字</Filter>
+    </ClCompile>
+    <ClCompile Include="WordEdit.cpp">
+      <Filter>技术文字</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -215,92 +254,92 @@
     <ClInclude Include="Common\Tools.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="excel9.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="rwExcel.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgMain.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgDiscern.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlDwg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DoubleClick.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="EditBlockDlg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="fcGsPreviewCtrl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="EditDlDlg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgAutoCreat.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgWeihao.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgPpsj.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgLjq.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgDlgg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgDlfj.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgAccessory.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgFrame.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="BlockJig.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DirTreeCtrl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgJswz.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SortStringArray.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgPrompt.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgHbTab.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgLhxx.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WordEdit.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DlgViewSet.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Common\LineUtil.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="DlgSelectItem.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="BlockJig.h">
+      <Filter>拖动实现</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgDiscern.h">
+      <Filter>接线图界面实现</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgWeihao.h">
+      <Filter>接线图界面实现</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgMain.h">
+      <Filter>接线图界面实现</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgPpsj.h">
+      <Filter>电缆图匹配设计</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgAccessory.h">
+      <Filter>电缆图匹配设计</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgDlfj.h">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClInclude>
+    <ClInclude Include="DlDwg.h">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgDlgg.h">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClInclude>
+    <ClInclude Include="DirTreeCtrl.h">
+      <Filter>树控件</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgViewSet.h">
+      <Filter>接线图界面实现</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgJswz.h">
+      <Filter>技术文字</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgAutoCreat.h">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgLjq.h">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgPrompt.h">
+      <Filter>错误提示对话框</Filter>
+    </ClInclude>
+    <ClInclude Include="DoubleClick.h">
+      <Filter>双击响应</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgFrame.h">
+      <Filter>图框</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgHbTab.h">
+      <Filter>电缆图匹配设计</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgLhxx.h">
+      <Filter>前期弹出界面及功能测试%28后期移除%29</Filter>
     </ClInclude>
     <ClInclude Include="DlgProresstest.h">
-      <Filter>头文件</Filter>
+      <Filter>进度条</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgSelectItem.h">
+      <Filter>接线图界面实现</Filter>
+    </ClInclude>
+    <ClInclude Include="EditBlockDlg.h">
+      <Filter>修改图块</Filter>
+    </ClInclude>
+    <ClInclude Include="EditDlDlg.h">
+      <Filter>修改图块</Filter>
+    </ClInclude>
+    <ClInclude Include="fcGsPreviewCtrl.h">
+      <Filter>控件预览dwg</Filter>
+    </ClInclude>
+    <ClInclude Include="excel9.h">
+      <Filter>excel操作类</Filter>
+    </ClInclude>
+    <ClInclude Include="rwExcel.h">
+      <Filter>excel操作类</Filter>
+    </ClInclude>
+    <ClInclude Include="SortStringArray.h">
+      <Filter>技术文字</Filter>
+    </ClInclude>
+    <ClInclude Include="WordEdit.h">
+      <Filter>技术文字</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
