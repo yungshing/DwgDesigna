@@ -12,6 +12,7 @@ class CDlgPrompt : public CAcUiDialog
 
 public:
 	CDlgPrompt(vector<Log> vec,CString sDqtxPath,CWnd* pParent = NULL);   // 标准构造函数
+	CDlgPrompt(vector<CreatWhLog> vec, CWnd* pParent = NULL);
 	virtual ~CDlgPrompt();
 
 // 对话框数据
@@ -23,15 +24,22 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CMap<DWORD, DWORD&, COLORREF, COLORREF&> MapItemColor;
+	//错误信息提示
 	vector<Log> m_vecLog;
 	CString m_sDqtx;
 	CListCtrl m_list1;
 	cExcel m_excel;
 	int m_nRow;
 	int m_nClo;
+	bool bFirst;
 	void ShowExcelPrompt(CString sSheetName,int nRow,int nCol);
 	void RefreshList();
 	void CloseExcel();
+
+	//cratewh时错误显示
+	vector<CreatWhLog> m_vecCreatWh;
+	bool m_bCreatWh;
+	void RefreshWhList();
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void CDlgPrompt::OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult);

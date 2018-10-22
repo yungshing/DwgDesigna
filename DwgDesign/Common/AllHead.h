@@ -65,3 +65,11 @@ struct FrameInfo
 	CString CPMC;//产品名称
 	CString GZJ;//关重件
 };
+
+//用于记录位号的文字id及插入点
+struct NamePtAndID
+{
+	CString name;
+	AcGePoint3d pt;
+	AcDbObjectId id;
+};

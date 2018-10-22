@@ -215,6 +215,7 @@ public:
 	{
 		//接线图生成功能
 		CAcModuleResourceOverride rs;
+
 		if (pDlg == NULL)
 		{
 			pDlg = new CDlgMain(acedGetAcadFrame());

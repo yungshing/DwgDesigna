@@ -5,6 +5,9 @@
 #include "DlgAccessory.h"
 #include "afxdialogex.h"
 
+extern bool strdlg();
+extern bool deletedlg();
+extern CDlgProresstest *prodlg;
 CDlgAccessory *pDlgAccessory;
 
 // CDlgAccessory 对话框
@@ -76,6 +79,7 @@ BEGIN_MESSAGE_MAP(CDlgAccessory, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_GETMINMAXINFO()
 	ON_NOTIFY(NM_CUSTOMDRAW,IDC_LIST_FJ,OnNMCustomdraw)
+	ON_BN_CLICKED(IDC_BTN_SELECT, &CDlgAccessory::OnBnClickedBtnSelect)
 END_MESSAGE_MAP()
 
 
@@ -368,6 +372,9 @@ void CDlgAccessory::GetFjmxbInfo()
 	AcDbObjectIdArray idArr = CDwgDatabaseUtil::GetAllEntityIds();
 	for (int i = 0; i < idArr.length();i++)
 	{
+		prodlg->setpos(50 / idArr.length()*(i + 1));
+		Sleep(100);
+
 		AcDbObjectId idTemp = idArr[i];
 		AcDbEntity *pEnt = NULL;
 		Acad::ErrorStatus es;
@@ -429,15 +436,18 @@ BOOL CDlgAccessory::CreatFjmxb(CString sSaveExcelPath)
 	excel.OpenWorkBook(sExcelPath);
 	for (int i = 0;i<m_vec_FjMark.size();i++)
 	{
+		prodlg->setpos(50+50 / m_vec_FjMark.size()*(i + 1));
+		Sleep(100);
+
 		FjMark temp = m_vec_FjMark[i];
 		CString sI;
 		sI.Format(_T("%d"), i+1);
-		excel.PutValue(2, 5 + i, sI);
-		excel.PutValue(3, 5 + i, temp.WH);
-		excel.PutValue(4, 5 + i, temp.DH);
-		excel.PutValue(6, 5 + i, temp.MC + temp.GGXH);
-		excel.PutValue(7, 5 + i, temp.DW);
-		excel.PutValue(8, 5 + i, temp.SL);
+		excel.PutValue(2, 4 + i, sI);
+		excel.PutValue(3, 4 + i, temp.WH);
+		excel.PutValue(4, 4 + i, temp.DH);
+		excel.PutValue(6, 4 + i, temp.MC + temp.GGXH);
+		excel.PutValue(7, 4 + i, temp.DW);
+		excel.PutValue(8, 4 + i, temp.SL);
 	}
 	excel.SaveAs(sSaveExcelPath);
 	excel.Quit();
@@ -465,6 +475,7 @@ void CDlgAccessory::OnNMDblclkListFj(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO:  在此添加控件通知处理程序代码
+	UpdateData(TRUE);
 	DWORD dwPos = GetMessagePos();
 	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
 	m_listFj.ScreenToClient(&point);
@@ -489,6 +500,7 @@ void CDlgAccessory::OnNMDblclkListFj(NMHDR *pNMHDR, LRESULT *pResult)
 		m_iCurrentSelect = nItem;
 	}
 	UpdateData(FALSE);
+	OnBnClickedBtnInsertfj();
 	*pResult = 0;
 }
 
@@ -621,8 +633,19 @@ void CDlgAccessory::OnBnClickedBtnCreattab()
 	{
 		return;
 	}
+	strdlg();
+	Sleep(100);
+	if (prodlg != NULL)
+	{
+		prodlg->SetWindowText(_T("生成excel表"));
+	}
+
 	GetFjmxbInfo();
 	CreatFjmxb(sSavePath);
+
+	prodlg->setpos(100);
+	Sleep(100);
+	deletedlg();
 	AfxMessageBox(_T("附件表格生成完成"));
 	return;
 }
@@ -739,14 +762,27 @@ void CDlgAccessory::OnBnClickedBtnJs()
 {
 	// TODO:  在此添加控件通知处理程序代码
 	UpdateData(TRUE);
+	strdlg();
+	Sleep(100);
+	if (prodlg != NULL)
+	{
+		prodlg->SetWindowText(_T("检索excel信息"));
+	}
 	//以选附件信息刷新
 	GetYxfjInfo();
+	prodlg->setpos(20);
+	Sleep(100);
 	RefreshYxfjList();
-
+	prodlg->setpos(50);
+	Sleep(100);
 	//电缆附件信息获取
 	GetFjInfo(m_sDlsjb);
+	prodlg->setpos(70);
+	Sleep(100);
 	RefreshLisht();
-
+	prodlg->setpos(100);
+	Sleep(100);
+	deletedlg();
 	UpdateData(FALSE);
 }
 
@@ -875,4 +911,23 @@ void CDlgAccessory::SetItemColor(DWORD iItem, COLORREF color)
 	m_listFj.RedrawItems(iItem, iItem);//重新染色
 	m_listFj.SetFocus();//设置焦点
 	UpdateWindow();
+}
+
+void CDlgAccessory::OnBnClickedBtnSelect()
+{
+	// TODO:  在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+	// 	CFileDialog importDlg(TRUE, _T(".xls"), NULL, 0,
+	// 		_T("格式1(*.xls) |*.xls|格式2(*.xlsx) |*.xlsx||"), acedGetAcadFrame());
+	CFileDialog importDlg(TRUE, _T(".xls"), NULL, 0,
+		_T("excel格式(*.xls;*.xlsx) |*.xls;*.xlsx|"), acedGetAcadFrame());
+	if (importDlg.DoModal() == IDOK)
+	{
+		m_sDlsjb = importDlg.GetPathName();
+	}
+	else
+	{
+		return;
+	}
+	UpdateData(FALSE);
 }

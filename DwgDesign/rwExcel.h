@@ -22,6 +22,11 @@ public:
 
 	void CreateWorkBook(void);
 	void OpenWorkBook(CString filename, CString sSheetName = _T(""));
+	//2018.10.15///////////////////////////
+	BOOL openSpecailFile(CString strFile);
+	void CloseExcelFile(BOOL if_save = FALSE);
+	CString strFilePath;
+	///////////////////////////////////////
 	void SelectAcitveSheet(void);
 	void SetSheetName(CString sheetname);
 	void SelectRange(CString range);
@@ -48,6 +53,7 @@ public:
 	void SaveAs(CString path, CString filename);
 	void Quit(void);
 	bool isOpenExcel(CString filePath);
+
 
 	void ActiveRange(int x,int y);
 	void ShowExcel();

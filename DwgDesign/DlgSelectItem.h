@@ -12,7 +12,8 @@ class CDlgSelectItem : public CAcUiDialog
 public:
 	CDlgSelectItem(int iBlockNum, AcGePoint3dArray ptArr, AcDbObjectIdArray idArr, double dx, double dy,CString sName,CString sWzdm,CString sView,
 		int iTextHight,CListCtrl* weihaolist,int nItem,CWnd* pParent = NULL);   // 标准构造函数
-	virtual ~CDlgSelectItem();
+	CDlgSelectItem(std::vector<NamePtAndID> MAPinfo, double dx, double dy, CWnd* pParent = NULL);   // 标准构造函数
+ 	virtual ~CDlgSelectItem();
 
 // 对话框数据
 	enum { IDD = IDD_DLG_ITEMSELECT };
@@ -23,10 +24,16 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	//多余位号的处理记录
+	std::vector<NamePtAndID> m_VecNamePtAndId;
+	bool m_bWhdw;//多余位号定位是不是运行
+	////////////////////
+
 	CTreeCtrl m_tree;
 	int m_iBlockNum;
 	AcDbObjectIdArray m_idArr;
 	AcGePoint3dArray m_ptArr;
+
 	AcDbObjectId m_idWire;
 	double m_dx;
 	double m_dy;

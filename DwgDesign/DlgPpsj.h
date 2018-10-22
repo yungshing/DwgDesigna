@@ -72,6 +72,9 @@ public:
 	CString m_sDlljgxb;//电缆连接关系表
 	CString m_sW;//w 设置
 	CString m_sBm;//bm 设置
+	bool isLhCable();//判断是不是连号电缆
+	int m_nLhCableNum;
+	void getLhCableNum();
 	CString m_sDllx;
 //	CString m_sDlgg;//电缆规格
 
@@ -84,7 +87,7 @@ public:
 	CListCtrl m_list_Dlfjxx;//电缆附件信息
 	CListCtrl m_list_Dlgg;//电缆规格
 
-	map<CString, char> m_mapLoc;
+	map<CString, CString> m_mapLoc;
 
 	CString m_sDlName;//用于存储导入电缆中的名字
 
@@ -102,13 +105,17 @@ public:
 	CString GetDlType(int iLeft, int iRight);//根据左右端的物资数量匹配出电缆类型
 	void FillListLjq();
 	void FillListDlgg();
+
 	BOOL GetDljxbInfo();//获取接线表信息到容器中
+	bool JudgeCreatJxb(CString sName);//判断是否需要接线表
 	BOOL CreatDljxb(AcGePoint3d ptInsert);//生成电缆接线表
 	
 	BOOL GetDlMxbInfo();//获取电缆明细表信息
 	BOOL CreatDlMxb();//生成电缆明细表
 
-	BOOL CreatDlYzb(CString sYzbName,BOOL bLh,AcGePoint3d ptInsert);//电缆印字表生成
+	BOOL CreatDlYzb(CString sYzbName,BOOL bLh,AcGePoint3d ptInsert);//电缆印字表生成 单根
+
+	BOOL CreatLhDlYzb(CString sYzbName, CString sYzbUnitName, BOOL bLh, AcGePoint3d ptInsert);//电缆印子表 连号
 
 	int m_nItem;//用于操作修改edit
 	int m_nSubItem;//修改

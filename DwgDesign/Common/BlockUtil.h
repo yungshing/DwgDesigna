@@ -30,7 +30,10 @@ public:
 	static void AppendAttributeToBlkRef( AcDbBlockReference * pBlkRef, AcDbAttributeDefinition * pAttDef );
 
 	// 设置属性块的某个属性值
-	static bool SetBlockRefAttribute(AcDbBlockReference *pBlkRef, const TCHAR* tag, const TCHAR* val,int coloindex = 7,AcDb::LineWeight linewidth =AcDb::kLnWtByLayer,double dHeight=0);
+	static bool SetBlockRefAttribute(AcDbBlockReference *pBlkRef, const TCHAR* tag, const TCHAR* val,int colorindex = 7,AcDb::LineWeight linewidth =AcDb::kLnWtByLayer,double dHeight=0);
+
+	//设置属性块的某个属性值，且需要根据长度处理
+	static bool SetBlockRefAttribute(AcDbBlockReference *pBlkRef,double dTextLen, const TCHAR* tag, const TCHAR* val, int colorindex = 7, AcDb::LineWeight linewidth = AcDb::kLnWtByLayer, double dHeight = 0);
 
 	// 获得块参照中某个属性的内容
 	static bool GetAttributeValue(AcDbBlockReference *pBlkRef, const TCHAR* tag, CString &value);

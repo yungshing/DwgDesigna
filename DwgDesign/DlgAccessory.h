@@ -5,6 +5,7 @@
 #include "excel9.h"
 #include "rwExcel.h"
 #include <algorithm>
+#include "DlgProresstest.h"
 
 // CDlgAccessory ¶Ô»°¿ò
 struct FjInfo
@@ -169,4 +170,5 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	afx_msg void OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedBtnSelect();
 };

@@ -40,6 +40,9 @@ public:
 	CString m_sView;
 	std::map<CString, CString> m_mapZjys;//中间映射表
 	std::map<CString, CString> m_mapName2Name;//存储两个名称
+
+	//存储图纸中存在的位号以及坐标，在修改表格后遗留添加的
+	std::vector<NamePtAndID> m_vecWeihaoAndPostionID;
 	//菜单弹出操作
 	CPoint m_menuPoint;
 	int m_iBlockNum;

@@ -104,11 +104,11 @@ BOOL CDlgMain::OnInitDialog()
 	m_stat.Create(this);
 	m_stat.AddTool(GetDlgItem(IDC_BTN_HIGHTLIGHT), _T("高亮所选视图"));
 	m_stat.AddTool(GetDlgItem(IDC_BTN_UNHIGHTLIGHT), _T("取消高亮所选视图"));
-	m_stat.AddTool(GetDlgItem(IDC_BTN_CHECKDWG), _T("检查非图块图形和已放置的位号标识,非图块:红色,位号标识:黄色"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_CHECKDWG), _T("检查非图块图形和已放置的位号标识,非图块:红色,位号标识:绿色"));
 	m_stat.AddTool(GetDlgItem(IDC_BTN_RESTOREDWG), _T("取消加亮"));
 	m_stat.AddTool(GetDlgItem(IDC_BTN_MAPCHECK), _T("检查电气特性表中存在但不存在中间映射表的位号"));
 	m_stat.AddTool(GetDlgItem(IDC_BTN_TABTOMARK), _T("识别电气特性表中的位号，并显示在下方位号列表中"));
-	m_stat.AddTool(GetDlgItem(IDC_BTN_AUTOWH), _T("在图纸中自动生成图块对应的位号标识"));
+	m_stat.AddTool(GetDlgItem(IDC_BTN_AUTOWH), _T("自动生成位号与物资代码一一对应的位号标识，同一物资代码对应多个位号需手动放置"));
 	m_stat.AddTool(GetDlgItem(IDC_BTN_CHECKWH), _T("在图纸中删除位号后,需刷新位号识别信息"));
 	m_stat.AddTool(GetDlgItem(IDC_BTN_REFLIST), _T("识别接线表中的连接关系，并显示在下方连接关系列表中"));
 	m_stat.AddTool(GetDlgItem(IDC_BTN_CHECKINFO), _T("在图纸中删除连线后，需检测连接信息"));
@@ -1244,18 +1244,16 @@ void CDlgMain::OnBnClickedBtnTabtomark()
 	}
 
 	//进度
-	prodlg->setpos(90);
+	prodlg->setpos(100);
 	Sleep(100);
+	deletedlg();
 
 	UpdateData(FALSE);
 	m_bShowPrompt = FALSE;
 	OnBnClickedBtnCheckwh();
 	m_bShowPrompt = TRUE;
 	
-	//进度
-	prodlg->setpos(100);
-	Sleep(100);
-	deletedlg();
+
 
 	if (bShowExcel)
 	{
@@ -1301,16 +1299,28 @@ void CDlgMain::OnBnClickedBtnAutowh()
 	CheckDwgWh();
 	CreatMarkToText(3);
 	CheckWhPostion();
-	CString sWhLogExcel;
-	if (ExportWhLog(sWhLogExcel))
+
+	if (m_vecWhLog.size() != 0)
 	{
-		ShellExecute(0,
-		 	_T("open"),
-			sWhLogExcel+_T(".xlsx"),
-		 	NULL,
-		 	NULL,
-		 	SW_SHOWNORMAL);
+		sort(m_vecWhLog.begin(), m_vecWhLog.end());
+
+		CDlgPrompt dlg(m_vecWhLog, acedGetAcadFrame());
+		int nRow = dlg.DoModal();
+		if (nRow == 2)
+		{
+			CString sWhLogExcel;
+			if (ExportWhLog(sWhLogExcel))
+			{
+				ShellExecute(0,
+					_T("open"),
+					sWhLogExcel + _T(".xlsx"),
+					NULL,
+					NULL,
+					SW_SHOWNORMAL);
+			}
+		}
 	}
+	
 }
 
 bool CDlgMain::ExportWhLog(CString &sExcelPath)
@@ -1790,7 +1800,7 @@ void CDlgMain::OnBnClickedBtnCheckdwg()
 				{
 					m_vecColor.push_back(pEnt->colorIndex());
 					m_ErrorId.append(idTemp);
-					pEnt->setColorIndex(2);
+					pEnt->setColorIndex(3);//绿色
 					iMark++;
 				}
 			}
@@ -1806,7 +1816,7 @@ void CDlgMain::OnBnClickedBtnCheckdwg()
 		CString sMark;
 		sMark.Format(_T("%d"), iMark);
 		CString sPrompt;
-		sPrompt = _T("发现: ") + sMark + _T(" 个不是图块的实体,并将块修改颜色为红色,位号标识修改为黄色.");
+		sPrompt = _T("发现: ") + sMark + _T(" 个不是图块的实体,并将块修改颜色为红色,位号标识修改为绿色.");
 		AfxMessageBox(sPrompt);
 	}
 	this->GetParent()->SetFocus();
@@ -1964,7 +1974,6 @@ BOOL CDlgMain::GetMapTab()
 	return TRUE;
 }
 
-
 void CDlgMain::OnBnClickedBtnHightlight()
 {
 	// TODO:  在此添加控件通知处理程序代码
@@ -2022,7 +2031,6 @@ void CDlgMain::OnBnClickedBtnHightlight()
 	this->SetFocus();
 }
 
-
 void CDlgMain::OnBnClickedBtnUnhightlight()
 {
 	// TODO:  在此添加控件通知处理程序代码
@@ -2038,7 +2046,6 @@ void CDlgMain::OnBnClickedBtnUnhightlight()
 	this->GetParent()->SetFocus();
 	this->SetFocus();
 }
-
 
 void CDlgMain::OnBnClickedBtnMapcheck()
 {
@@ -2087,7 +2094,6 @@ void CDlgMain::OnBnClickedBtnMapcheck()
 	}
 	return;
 }
-
 
 void CDlgMain::OnBnClickedBtnManualinsert()
 {

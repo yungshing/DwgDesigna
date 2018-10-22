@@ -27,9 +27,11 @@ public:
 	BOOL keepTheFocus();
 	virtual void OnCancel();
 public:
+	bool CheckDwgBlock();
 	CString m_sCurrentView;
 	CAcUiComboBox m_cmb_view;
 	AcDbObjectIdArray m_ViewIdArr;
+	bool m_bSelect;
 	bool m_boK;
 	afx_msg void OnBnClickedBtnSetview();
 	afx_msg void OnBnClickedButton1();

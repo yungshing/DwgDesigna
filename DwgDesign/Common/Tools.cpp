@@ -1399,3 +1399,49 @@ AcDbObjectId MirrorBlock(AcDbObjectId idBlock)
 	pEnt->close();
 	return idBlock;
 }
+
+double GetBlockHight(AcDbObjectId objId)
+{
+	double dHight = 0.0;
+	if (objId.isNull())
+	{
+		return dHight;
+	}
+	AcDbExtents exts;
+	AcDbEntity* pEnt = NULL;
+	if (acdbOpenAcDbEntity(pEnt, objId, AcDb::kForRead) != Acad::eOk)
+	{
+		return dHight;
+	}
+	pEnt->getGeomExtents(exts);
+	pEnt->close();
+	dHight = abs(exts.maxPoint().y - exts.minPoint().y);
+	return dHight;
+}
+
+// double OpenObjAndGetLength(AcDbObjectId objId)
+// {
+// 	double dWidth = 0.0;
+// 	if (objId.isNull())
+// 	{
+// 		return dWidth;
+// 	}
+// 	AcDbExtents exts;
+// 	AcDbEntity* pEnt = NULL;
+// 	if (acdbOpenAcDbEntity(pEnt, objId, AcDb::kForRead) != Acad::eOk)
+// 	{
+// 		return dWidth;
+// 	}
+// 	pEnt->getGeomExtents(exts);
+// 	pEnt->close();
+// 	dWidth = abs(exts.minPoint().x - exts.maxPoint().x);
+// 	double dTmp = abs(exts.minPoint().y - exts.maxPoint().y);
+// 	if (dWidth > dTmp)
+// 	{
+// 		return dWidth;
+// 	}
+// 	else
+// 	{
+// 		return dTmp;
+// 	}
+// }

@@ -12,7 +12,7 @@ CDlgViewSet *pSetViewDlg = NULL;
 IMPLEMENT_DYNAMIC(CDlgViewSet, CAcUiDialog)
 
 CDlgViewSet::CDlgViewSet(CWnd* pParent /*=NULL*/)
-: CAcUiDialog(CDlgViewSet::IDD, pParent)
+: CAcUiDialog(CDlgViewSet::IDD, pParent), m_bSelect(false)
 {
 
 }
@@ -56,6 +56,11 @@ void CDlgViewSet::PostNcDestroy()
 void CDlgViewSet::OnClose()
 {
 	// TODO:  在此添加消息处理程序代码和/或调用默认值
+	if (m_bSelect)
+	{
+		AfxMessageBox(_T("请取消选择视图图块操作后再进行关闭!"));
+		return;
+	}
 	CAcUiDialog::OnClose();
 	DestroyWindow();
 }
@@ -125,6 +130,33 @@ void CDlgViewSet::OnCancel()
 
 
 
+bool CDlgViewSet::CheckDwgBlock()
+{
+	bool bBaohanBlock = false;
+	acDocManager->lockDocument(curDoc());
+	AcDbObjectIdArray idArr = CDwgDatabaseUtil::GetAllEntityIds();
+	for (int i = 0; i < idArr.length();i++)
+	{
+		AcDbObjectId idTemp = idArr[i];
+		AcDbEntity *pEnt = NULL;
+		Acad::ErrorStatus es;
+		es = acdbOpenAcDbEntity(pEnt, idTemp, AcDb::kForRead);
+		if (es!=eOk)
+		{
+			continue;
+		}
+		if (pEnt->isKindOf(AcDbBlockReference::desc()))
+		{
+			bBaohanBlock = true;
+			pEnt->close();
+			break;
+		}
+		pEnt->close();
+	}
+	acDocManager->unlockDocument(curDoc());
+	return bBaohanBlock;
+}
+
 void CDlgViewSet::OnBnClickedBtnSetview()
 {
 	// TODO:  在此添加控件通知处理程序代码
@@ -137,7 +169,9 @@ void CDlgViewSet::OnBnClickedBtnSetview()
 	}
 	acDocManager->lockDocument(curDoc());
 	AcDbObjectIdArray idArr;
+	m_bSelect = true;
 	bool b = GetSelection(idArr, _T("\n选择需要设置视图的实体."));
+	m_bSelect = false;
 	if (b)
 	{
 		for (int i = 0; i < idArr.length(); i++)
@@ -162,12 +196,25 @@ extern CDlgMain* pDlg;
 void CDlgViewSet::OnBnClickedButton1()
 {
 	// TODO:  在此添加控件通知处理程序代码
-	PostNcDestroy();
-	int nRet = AfxMessageBox(_T("请确保此图是从微波组件结构设计模块中导出，并且该图纸中无图框"), MB_YESNO);
-	if (nRet == 6)
+	if (m_bSelect)
 	{
+		AfxMessageBox(_T("请取消选择视图图块操作后再进行下一步!"));
+		return;
+	}
+	PostNcDestroy();
+	if (CheckDwgBlock())
+	{
+		AfxMessageBox(_T("此图包含图块,可进行后续处理"));
 		pDlg->ShowWindow(SW_SHOW);
 	}
+	else
+	{
+		int nRet = AfxMessageBox(_T("请确认此图是从微波组件结构设计模块导出"), MB_YESNO);
+		if (nRet == 6)
+		{
+			pDlg->ShowWindow(SW_SHOW);
+		}
+	}	
 }
 
 

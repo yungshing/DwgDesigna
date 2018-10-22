@@ -507,6 +507,10 @@ bool CDlgWeihao::ConnectDzb(CString sMarkText)
 void CDlgWeihao::FindWh()
 {
 	m_vecListinfo.clear();
+
+	//用于存储不在图纸中的位号 插入点以及id
+	m_vecWeihaoAndPostionID.clear();
+
 	int iItem = m_listWeihao.GetItemCount();
 	for (int i = 0; i < iItem; i++)
 	{
@@ -539,13 +543,20 @@ void CDlgWeihao::FindWh()
 		CDwgDatabaseUtil::getXdata(_T("标记"), sTag, pEnt);
 		CDwgDatabaseUtil::getXdata(_T("物资代码"), sWzdm, pEnt);
 		CDwgDatabaseUtil::getXdata(_T("视图"), sView, pEnt);
+		//取出位号的坐标
+		AcDbText *pText = static_cast<AcDbText*>(pEnt);
+		AcGePoint3d ptInsert = pText->alignmentPoint();
+
 		pEnt->close();		
 		if (sTag!=_T(""))
 		{
+			bool TabExistWh = false;//表格中是否存在此位号
+
 			for (int j = 0; j < m_listWeihao.GetItemCount();j++)
 			{
 		    	CString sTemp = m_listWeihao.GetItemText(j, 1);
 				CString sTemp2 = m_listWeihao.GetItemText(j, 2);
+				//如有中间映射信息 则将物资代码转化为中间映射消息
 				if (m_mapZjys.size() != 0)
 				{
 					map<CString, CString>::iterator atTemp = m_mapZjys.find(sTemp2);
@@ -566,11 +577,48 @@ void CDlgWeihao::FindWh()
 				{
 					m_listWeihao.SetCheck(j,TRUE);
 					m_vecListinfo[j].check = TRUE;
+					TabExistWh = true;
 				}
+			}
+			if (!TabExistWh)//如果位号不在现有tab中
+			{
+				NamePtAndID temp;
+				temp.name = sTag;
+				temp.pt = ptInsert;
+				temp.id = idTemp;
+				m_vecWeihaoAndPostionID.push_back(temp);
 			}
 		}
 	}
 	acDocManager->unlockDocument(curDoc());
+
+	if (m_vecWeihaoAndPostionID.size() != 0)
+	{
+		int nRet=AfxMessageBox(_T("查找到遗留位号,是否处理？"), MB_OKCANCEL);
+		if (nRet==1)
+		{
+			if (pDlgSelect == NULL)
+			{
+				pDlgSelect = new CDlgSelectItem(m_vecWeihaoAndPostionID,20,20, acedGetAcadFrame());
+				pDlgSelect->Create(IDD_DLG_ITEMSELECT);
+				pDlgSelect->ShowWindow(SW_SHOW);
+			}
+			else
+			{
+				if (!pDlgSelect->m_bInsert)
+				{
+					pDlgSelect->DestroyWindow();
+					pDlgSelect = new CDlgSelectItem (m_vecWeihaoAndPostionID,20,20, acedGetAcadFrame());
+					pDlgSelect->Create(IDD_DLG_ITEMSELECT);
+					pDlgSelect->ShowWindow(SW_SHOW);
+				}
+				else
+				{
+					AfxMessageBox(_T("请esc后再进行切换"));
+				}
+			}
+		}
+	}
 	return;
 }
 

@@ -28,6 +28,18 @@ int iTextHight,CListCtrl* weihaolist,int nItem ,CWnd* pParent /*=NULL*/)
 	m_nItem = nItem;
 
 	m_bInsert = false;
+
+	m_bWhdw = false;
+}
+
+CDlgSelectItem::CDlgSelectItem(std::vector<NamePtAndID> Vecinfo, double dx, double dy, CWnd* pParent /*= NULL*/)
+	: CAcUiDialog(CDlgSelectItem::IDD, pParent)
+{
+	m_dx = dx;
+	m_dy = dy;
+	m_VecNamePtAndId = Vecinfo;
+
+	m_bWhdw = true;
 }
 
 CDlgSelectItem::~CDlgSelectItem()
@@ -76,6 +88,17 @@ BOOL CDlgSelectItem::OnInitDialog()
 		htr=m_tree.InsertItem(sTemp,NULL,htr);
 		m_tree.SetItemData(htr, i);
 	}
+	//界面作为多余位号提示
+	if (m_VecNamePtAndId.size()!=0)
+	{
+		SetWindowText(_T("多余位号定位"));
+		GetDlgItem(IDC_STATIC_RCLICK)->SetWindowText(_T("  "));
+		for (int i = 0; i < m_VecNamePtAndId.size(); i++)
+		{
+			htr = m_tree.InsertItem(m_VecNamePtAndId[i].name, NULL, htr);
+			m_tree.SetItemData(htr, i);
+		}
+	}
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常:  OCX 属性页应返回 FALSE
 }
@@ -84,27 +107,58 @@ BOOL CDlgSelectItem::OnInitDialog()
 void CDlgSelectItem::OnNMClickTreeSelect(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// TODO:  在此添加控件通知处理程序代码
-	CPoint point;
-	GetCursorPos(&point);
-	m_tree.ScreenToClient(&point);
-	UINT uFlags;
-	HTREEITEM CurrentItem;
-	CurrentItem = m_tree.HitTest(point, &uFlags);
-	int i=m_tree.GetItemData(CurrentItem);
-	//获取点击index后删除
-	acDocManager->lockDocument(curDoc());
-	if (m_idWire!=AcDbObjectId::kNull)
+	if (!m_bWhdw)
 	{
-		DeleteWire(m_idWire);
-		UnHighLight(m_idArr);
+		CPoint point;
+		GetCursorPos(&point);
+		m_tree.ScreenToClient(&point);
+		UINT uFlags;
+		HTREEITEM CurrentItem;
+		CurrentItem = m_tree.HitTest(point, &uFlags);
+		int i = m_tree.GetItemData(CurrentItem);
+		//获取点击index后删除
+		acDocManager->lockDocument(curDoc());
+		if (m_idWire != AcDbObjectId::kNull)
+		{
+			DeleteWire(m_idWire);
+			UnHighLight(m_idArr);
+		}
+		MoveView(m_ptArr[i], m_dx * 3, m_dy * 3);
+		m_idWire = WirePrompt(GetBlockRefExten(m_idArr[i], 3));
+		HighLight(m_idArr);
+		acDocManager->unlockDocument(curDoc());
+		acTransactionManagerPtr()->flushGraphics();
+		acedUpdateDisplay();
+		*pResult = 0;
+		return;
 	}
-	MoveView(m_ptArr[i], m_dx * 3, m_dy * 3);
-	m_idWire = WirePrompt(GetBlockRefExten(m_idArr[i], 3));
-	HighLight(m_idArr);
-	acDocManager->unlockDocument(curDoc());
-	acTransactionManagerPtr()->flushGraphics();
-	acedUpdateDisplay();
-	*pResult = 0;
+	else
+	{
+		CPoint point;
+		GetCursorPos(&point);
+		m_tree.ScreenToClient(&point);
+		UINT uFlags;
+		HTREEITEM CurrentItem;
+		CurrentItem = m_tree.HitTest(point, &uFlags);
+		int i = m_tree.GetItemData(CurrentItem);
+		//获取点击index后删除
+		acDocManager->lockDocument(curDoc());
+		if (m_idWire != AcDbObjectId::kNull)
+		{
+			DeleteWire(m_idWire);
+			UnHighLight(m_idArr);
+		}
+
+
+		MoveView(m_VecNamePtAndId[i].pt, m_dx * 3, m_dy * 3);
+		m_idWire = WirePrompt(GetBlockRefExten(m_VecNamePtAndId[i].id, 3));
+		HighLight(m_idArr);
+		acDocManager->unlockDocument(curDoc());
+		acTransactionManagerPtr()->flushGraphics();
+		acedUpdateDisplay();
+		*pResult = 0;
+	}
+	
 }
 
 
@@ -128,6 +182,11 @@ void CDlgSelectItem::OnNMClickTreeSelect(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CDlgSelectItem::OnNMRClickTreeSelect(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	if (m_bWhdw)
+	{
+		*pResult = 0;
+		return;
+	}
 	// TODO:  在此添加控件通知处理程序代码
 	if (m_bInsert)
 	{

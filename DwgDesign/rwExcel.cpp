@@ -77,12 +77,135 @@ void cExcel::OpenWorkBook(CString filename, CString sSheetName /*= _T("")*/)
 	pSheets.AttachDispatch(pBook.GetWorksheets(), true);
 	if ( ! sSheetName.IsEmpty())
 	{
-		pSheet.AttachDispatch(pSheets.GetItem(_variant_t(sSheetName)), true);
+		LPDISPATCH lpd = pSheets.GetItem(_variant_t(sSheetName));
+		if (lpd)
+		{
+			pSheet.AttachDispatch(lpd, true);
+		}		
 	}
 	else
 	{
-		pSheet.AttachDispatch(pSheets.GetItem(COleVariant((short)(1))), true);
+		LPDISPATCH lpd = pSheets.GetItem(COleVariant((short)(1)));
+		if (lpd)
+		{
+			pSheet.AttachDispatch(lpd, true);
+		}	
 	}
+}
+
+BOOL cExcel::openSpecailFile(CString strFile)
+{
+	LPDISPATCH   lpDisp = NULL;
+	CoInitialize(NULL);
+//	CloseExcelFile();
+	CLSID clsid;
+	HRESULT hr;
+	hr = ::CLSIDFromProgID(_T("Excel.Application"), &clsid); //通过ProgID取得CLSID
+	if (FAILED(hr))
+	{
+		AfxMessageBox(_T("不会吧，竟然没有安装OFFICE"));
+		return FALSE;
+	}
+
+	IUnknown *pUnknown = NULL;
+	IDispatch *pDispatch = NULL;
+	hr = ::GetActiveObject(clsid, NULL, &pUnknown); //查找是否有WORD程序在运行
+	if (FAILED(hr))
+	{
+		if (!pApp.CreateDispatch(_T("Excel.Application"), NULL))
+		{
+			AfxMessageBox(_T("EXCEL初始化时出错!"), MB_OK | MB_ICONERROR);
+			return FALSE;
+		}
+		try
+		{
+			lpDisp = pApp.GetWorkbooks();
+			pBooks.AttachDispatch(lpDisp, TRUE);
+
+			lpDisp = pBooks.Open(strFile, vtMissing, vtMissing, vtMissing,
+				vtMissing, vtMissing, vtMissing, vtMissing, vtMissing, vtMissing, vtMissing, vtMissing, vtMissing);
+			pBook.AttachDispatch(lpDisp, TRUE);
+
+			lpDisp = pBook.GetWorksheets();
+			pSheets.AttachDispatch(lpDisp, TRUE);
+			pApp.SetVisible(TRUE);
+		}
+		catch (CException* e)
+		{
+			//AfxMessageBox(_T("文件打开失败，可能未保存"));
+			return FALSE;
+		}
+	}
+	else
+	{
+		try
+		{
+			hr = pUnknown->QueryInterface(IID_IDispatch, (LPVOID *)&pApp);
+			if (FAILED(hr))
+				throw(_T("没有取得IDispatchPtr"));
+			pUnknown->Release();
+			pUnknown = NULL;
+
+			lpDisp = pApp.GetWorkbooks();
+			pBooks.AttachDispatch(lpDisp, TRUE);
+			int nLen = pBooks.GetCount();
+			CString strName;
+			bool bIsFind = false;
+			for (int i = 1; i <= nLen; i++)
+			{
+				lpDisp = pBooks.GetItem(_variant_t(i));
+				pBook.AttachDispatch(lpDisp, TRUE);
+				strName = pBook.GetFullName();
+				if (strName.CompareNoCase(strFile) == 0)
+				{
+					bIsFind = true;
+					break;
+				}
+			}
+			if (!bIsFind)
+			{
+				lpDisp = pBooks.Open(strFile, vtMissing, vtMissing, vtMissing,
+					vtMissing, vtMissing, vtMissing, vtMissing, vtMissing, vtMissing, vtMissing, vtMissing, vtMissing);
+				pBook.AttachDispatch(lpDisp, TRUE);
+			}
+
+			lpDisp = pBook.GetWorksheets();
+			pSheets.AttachDispatch(lpDisp, TRUE);
+			pApp.SetVisible(TRUE);
+		}
+		catch (CException* e)
+		{
+			//AfxMessageBox(_T("文件打开失败，可能未保存"));
+			return FALSE;
+		}
+	}
+
+	strFilePath = strFile;
+	return TRUE;
+}
+
+void cExcel::CloseExcelFile(BOOL if_save /*= FALSE*/)
+{
+	//如果已经打开，关闭文件
+	COleVariant covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
+	if (strFilePath.IsEmpty() == FALSE)
+	{
+		//如果保存,交给用户控制,让用户自己存，如果自己SAVE，会出现莫名的等待
+		//
+		pBook.Close(COleVariant(short(FALSE)), COleVariant(strFilePath), covOptional);
+		pBooks.Close();
+		//打开文件的名称清空
+		strFilePath.Empty();
+	}
+
+
+	pRange.ReleaseDispatch();
+	pSheet.ReleaseDispatch();
+	pSheets.ReleaseDispatch();
+	pBook.Close(COleVariant(short(FALSE)), _variant_t(strFilePath), covOptional);
+	pBook.ReleaseDispatch();
+	pBooks.Close();
+	pBooks.ReleaseDispatch();
 }
 
 void cExcel::SelectAcitveSheet(void)
@@ -463,7 +586,6 @@ bool cExcel::isOpenExcel(CString filePath)
 	if (!iofile)//如果打开失败
 	{
 		//MessageBox(_T("文件可能已经打开，请注意检查"));
-
 		return true;
 	}
 

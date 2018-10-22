@@ -147,3 +147,5 @@ std::vector<CString> GetTextVal(CString sTextPath);
 AcGePoint3d offsetPoint(AcGePoint3d pt, double x, double y);
 
 AcDbObjectId MirrorBlock(AcDbObjectId idBlock);
+
+double GetBlockHight(AcDbObjectId objId);

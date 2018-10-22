@@ -15,6 +15,14 @@ CDlgPrompt::CDlgPrompt(vector<Log> vec,CString sDqtxPath,CWnd* pParent /*=NULL*/
 {
 	m_sDqtx = sDqtxPath;
 	m_vecLog = vec;
+	bFirst = true;
+	m_bCreatWh = false;
+}
+
+CDlgPrompt::CDlgPrompt(vector<CreatWhLog> vec, CWnd* pParent /*= NULL*/) :CAcUiDialog(CDlgPrompt::IDD,pParent)
+{
+	m_vecCreatWh = vec;
+	m_bCreatWh = true;
 }
 
 CDlgPrompt::~CDlgPrompt()
@@ -40,19 +48,44 @@ END_MESSAGE_MAP()
 // CDlgPrompt 消息处理程序
 
 
+void CDlgPrompt::RefreshWhList()
+{
+	int nCount = m_vecCreatWh.size();
+	m_list1.DeleteAllItems();
+	for (int i = 0; i < nCount; i++)
+	{
+		CreatWhLog temp = m_vecCreatWh[i];
+		m_list1.InsertItem(i, _T(""));
+		m_list1.SetItemText(i, 0, temp.wtms);
+	}
+}
+
 BOOL CDlgPrompt::OnInitDialog()
 {
 	CAcUiDialog::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
-	m_list1.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-	m_list1.InsertColumn(0, _T("Sheet名称"),LVCFMT_LEFT,100);
-	m_list1.InsertColumn(1, _T("行"), LVCFMT_LEFT, 40);
-	m_list1.InsertColumn(2, _T("列"), LVCFMT_LEFT, 40);
-	m_list1.InsertColumn(3, _T("错误信息"), LVCFMT_LEFT, 200);
-	m_list1.InsertColumn(4, _T("处理方法"), LVCFMT_LEFT, 200);
+	if (!m_bCreatWh)
+	{
+		m_list1.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+		m_list1.InsertColumn(0, _T("Sheet名称"), LVCFMT_LEFT, 100);
+		m_list1.InsertColumn(1, _T("行"), LVCFMT_LEFT, 40);
+		m_list1.InsertColumn(2, _T("列"), LVCFMT_LEFT, 40);
+		m_list1.InsertColumn(3, _T("错误信息"), LVCFMT_LEFT, 200);
+		m_list1.InsertColumn(4, _T("处理方法"), LVCFMT_LEFT, 200);
 
-	RefreshList();
+		RefreshList();
+	}
+	else
+	{
+		m_list1.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+		m_list1.InsertColumn(0, _T("问题描述"), LVCFMT_LEFT, 600);
+
+		RefreshWhList();
+
+		SetDlgItemText(IDOK, _T("确定"));
+		SetDlgItemText(IDCANCEL, _T("保存excel"));
+	}
 	UpdateData(FALSE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常:  OCX 属性页应返回 FALSE
@@ -60,20 +93,29 @@ BOOL CDlgPrompt::OnInitDialog()
 
 void CDlgPrompt::ShowExcelPrompt(CString sSheetName, int nRow, int nCol)
 {
-	bool b =m_excel.isOpenExcel(m_sDqtx);	
-	if (!b)
-	{
-		if (!m_excel.StartApp())
-		{
-			AfxMessageBox(_T("excel打开失败"));
-			return;
-		}
-		m_excel.OpenWorkBook(m_sDqtx);
-	}
-	else
-	{
-		m_excel.GetSheets();
-	}
+// 	bool b =m_excel.isOpenExcel(m_sDqtx);
+// 	if (b&&bFirst)
+// 	{
+// 		AfxMessageBox(_T("当前特性表已打开，请先关闭！"));
+// 		return;
+// 	}
+// 	if (!b)
+// 	{
+// 		if (!m_excel.StartApp())
+// 		{
+// 			AfxMessageBox(_T("excel打开失败"));
+// 			return;
+// 		}
+// 		bFirst = false;
+// 		m_excel.OpenWorkBook(m_sDqtx);
+// 	}
+// 	else
+// 	{
+// 		m_excel.GetSheets();
+// 	}
+	m_excel.openSpecailFile(m_sDqtx);
+
+
 	m_excel.SwitchToSheet(sSheetName);	
 	m_excel.ActiveRange(nRow, nCol);
 	m_excel.ShowExcel();
@@ -160,6 +202,11 @@ void CDlgPrompt::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO:  在此添加控件通知处理程序代码
+	if (m_bCreatWh)
+	{
+		*pResult = 0;
+		return;
+	}
 	DWORD dwPos = GetMessagePos();
 	CPoint point(LOWORD(dwPos), HIWORD(dwPos));
 	m_list1.ScreenToClient(&point);
@@ -186,7 +233,10 @@ void CDlgPrompt::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
 void CDlgPrompt::OnBnClickedOk()
 {
 	// TODO:  在此添加控件通知处理程序代码
-	CloseExcel();
+	if (!m_bCreatWh)
+	{
+		CloseExcel();
+	}	
 	CAcUiDialog::OnOK();
 }
 
@@ -194,7 +244,10 @@ void CDlgPrompt::OnBnClickedOk()
 void CDlgPrompt::OnBnClickedCancel()
 {
 	// TODO:  在此添加控件通知处理程序代码
-	CloseExcel();
+	if (!m_bCreatWh)
+	{
+		CloseExcel();
+	}
 	CAcUiDialog::OnCancel();
 }
 
@@ -202,6 +255,9 @@ void CDlgPrompt::OnBnClickedCancel()
 void CDlgPrompt::OnClose()
 {
 	// TODO:  在此添加消息处理程序代码和/或调用默认值
-	CloseExcel();
+	if (!m_bCreatWh)
+	{
+		CloseExcel();
+	}	
 	CAcUiDialog::OnClose();
 }

@@ -191,7 +191,95 @@ bool CBlockUtil::SetBlockRefAttribute(AcDbBlockReference *pBlkRef, const TCHAR* 
 	return bRet;
 }
 
-void CBlockUtil::AppendAttributeToBlkRef( AcDbBlockReference * pBlkRef, AcDbAttributeDefinition * pAttDef )
+bool CBlockUtil::SetBlockRefAttribute(AcDbBlockReference *pBlkRef, double dTextLen, const TCHAR* tag, const TCHAR* val, int colorindex /*= 7*/, AcDb::LineWeight linewidth /*= AcDb::kLnWtByLayer*/, double dHeight /*= 0*/)
+{
+	AcDbBlockTableRecord *pBlkDefRcd = NULL;
+	bool bRet = true;
+	if (acdbOpenObject(pBlkDefRcd, pBlkRef->blockTableRecord(), AcDb::kForRead) == Acad::eOk)
+	{
+		// 块定义中是否包含了对应的属性
+		if (pBlkDefRcd->hasAttributeDefinitions())
+		{
+			AcDbBlockTableRecordIterator *pItr = NULL;
+			pBlkDefRcd->newIterator(pItr);
+			AcDbEntity *pEnt = NULL;
+
+			for (pItr->start(); !pItr->done(); pItr->step())
+			{
+				if (pItr->getEntity(pEnt, AcDb::kForRead) != eOk)
+				{
+					return false;
+				}
+
+				// 检查是否是属性定义
+				AcDbAttributeDefinition *pAttDef = AcDbAttributeDefinition::cast(pEnt);
+				if (pAttDef != NULL)
+				{
+					TCHAR* pszTag = pAttDef->tag();
+					CString strTag = pszTag;
+					acutDelString(pszTag);
+					if (strTag.CompareNoCase(tag) == 0)
+					{
+						// 遍历块参照的所有属性，判断是否包含了对应的属性
+						bool bFound = false;
+						AcDbObjectIterator *attIt = pBlkRef->attributeIterator();
+						for (attIt->start(); !attIt->done(); attIt->step())
+						{
+							AcDbAttribute *pAtt = NULL;
+							Acad::ErrorStatus es = acdbOpenObject(pAtt, attIt->objectId(), AcDb::kForWrite);
+							if (es == Acad::eOk)
+							{
+								pszTag = pAtt->tag();
+								strTag = pszTag;
+								acutDelString(pszTag);
+								if (strTag.CompareNoCase(tag) == 0)
+								{
+									pAtt->setTextString(val);
+									//当前不修改属性
+									//2016.8.10修改增加设置块属性的其他属性
+									pAtt->setColorIndex(colorindex);//设置颜色
+									pAtt->setLineWeight(linewidth);//设置线宽
+									if (dHeight != 0)//设置高度 如果不为0就设置
+									{
+										pAtt->setHeight(dHeight);
+									}
+									//处理宽度///////
+									AcDbExtents exts;
+									pAtt->getGeomExtents(exts);
+									double dWtemp = abs(exts.minPoint().x - exts.maxPoint().x);
+									double dwidthfactor = dTextLen / dWtemp;
+									pAtt->setWidthFactor(dwidthfactor);
+									/////////////////
+									bFound = true;
+								}
+								pAtt->close();
+							}
+						}
+						delete attIt;
+
+						// 如果没有找到给定名称的属性，就新建这个属性
+						if (!bFound)
+						{
+							AppendAttributeToBlkRef(pBlkRef, pAttDef);
+						}
+					}
+				}
+				pEnt->close();
+			}
+			delete pItr;
+		}
+		else
+		{
+			bRet = false;
+		}
+
+		pBlkDefRcd->close();
+	}
+
+	return bRet;
+}
+
+void CBlockUtil::AppendAttributeToBlkRef(AcDbBlockReference * pBlkRef, AcDbAttributeDefinition * pAttDef)
 {
 	// 创建一个新的属性对象
 	AcDbAttribute *pAtt = new AcDbAttribute();

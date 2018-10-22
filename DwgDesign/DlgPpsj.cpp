@@ -13,6 +13,8 @@ extern bool strdlg();
 extern bool deletedlg();
 extern CDlgProresstest *prodlg;
 
+#define UNIT _T("(单元)")
+
 IMPLEMENT_DYNAMIC(CDlgPpsj, CDialogEx)
 
 CDlgPpsj::CDlgPpsj(CWnd* pParent /*=NULL*/)
@@ -22,6 +24,7 @@ CDlgPpsj::CDlgPpsj(CWnd* pParent /*=NULL*/)
 	m_dY = 18.370;
 	m_dLen = 7.348;
 	m_bLh = FALSE;
+	m_nLhCableNum = 0;
 }
 
 CDlgPpsj::~CDlgPpsj()
@@ -178,6 +181,7 @@ void CDlgPpsj::OnBnClickedBtnSelect()
 		AfxMessageBox(_T("excel中信息存在问题，请查看日志文件!"));
 		return;
 	}	
+	m_bLh = isLhCable();
 	prodlg->setpos(20);
 	Sleep(100);
 	
@@ -198,6 +202,31 @@ void CDlgPpsj::OnBnClickedBtnSelect()
 	Sleep(100);
 	deletedlg();
 	AfxMessageBox(_T("打开及检测完毕"));
+	return;
+}
+
+bool CDlgPpsj::isLhCable()
+{
+	int iLen = m_sBm.Find(_T("/"));
+	if (iLen!=-1)
+	{
+		getLhCableNum();
+		return true;
+	}
+	return false;
+}
+
+void CDlgPpsj::getLhCableNum()
+{
+	int iLen = m_sBm.Find(_T("/"));
+	if (iLen!=-1)
+	{
+		CString sTempEnd = m_sBm.Right(m_sBm.GetLength()-iLen-1);
+		sTempEnd.TrimLeft(_T("0"));
+		m_nLhCableNum = _wtoi(sTempEnd);
+		return;
+	}
+	m_nLhCableNum = 0;
 	return;
 }
 
@@ -404,7 +433,7 @@ void CDlgPpsj::GetDlInfo()
 	int iMark1 = 1, iMark2 = 1;
 	CString LEFT, RIGHT;//左右标记
 	CString LOC1, LOC2;//位置1位置2
-	CString WZDM1=_T(""), WZDM2=_T("");//根据物资代码区分端子头
+	CString WH1=_T(""), WH2=_T("");//根据位号区分端子头
 
 	m_vecLeft.clear();
 	m_vecRight.clear();
@@ -424,7 +453,7 @@ void CDlgPpsj::GetDlInfo()
 		leftTemp.wh = sWh;
 		leftTemp.dybs = sDybs;
 
-		if (sWzdm==_T(""))
+		if (sWh==_T(""))
 		{
 			continue;
 		}
@@ -438,7 +467,7 @@ void CDlgPpsj::GetDlInfo()
 		rightTemp.wh = sWh2;
 		rightTemp.dybs = sDybs2;
 		
-		if (sWzdm2==_T(""))
+		if (sWh2==_T(""))
 		{
 			continue;
 		}
@@ -452,9 +481,9 @@ void CDlgPpsj::GetDlInfo()
 		ini.GetValueOfKey(_T("PPSJ"), _T("LEFT"), sZuo);
 		ini.GetValueOfKey(_T("PPSJ"), _T("RIGHT"), sYou);
 
-		if (WZDM1 == _T(""))
+		if (WH1 == _T(""))
 		{
-			WZDM1 = sWzdm;
+			WH1 = sWh;
 			CString sI;
 			sI.Format(_T("%d"), iMark1);
 			LOC1 = sZuo + sI;
@@ -465,9 +494,9 @@ void CDlgPpsj::GetDlInfo()
 		}
 		else
 		{
-			if (sWzdm!=WZDM1)
+			if (sWh!=WH1)
 			{
-				WZDM1 = sWzdm;
+				WH1 = sWh;
 				CString sI;
 				sI.Format(_T("%d"), iMark1);
 				LOC1 = sZuo + sI;
@@ -477,9 +506,9 @@ void CDlgPpsj::GetDlInfo()
 				bLeftChange = TRUE;
 			}
 		}
-		if (WZDM2 == _T(""))
+		if (WH2 == _T(""))
 		{
-			WZDM2 = sWzdm2;
+			WH2 = sWh2;
 			CString sI;
 			sI.Format(_T("%d"), iMark2);
 			LOC2 = sYou + sI;
@@ -490,10 +519,9 @@ void CDlgPpsj::GetDlInfo()
 		}
 		else
 		{
-			if (sWzdm2!=WZDM2)
+			if (sWh2!=WH2)
 			{
-
-				WZDM2 = sWzdm2;
+				WH2 = sWh2;
 				CString sI;
 				sI.Format(_T("%d"), iMark2);
 				LOC2 = sYou + sI;
@@ -538,7 +566,8 @@ void CDlgPpsj::FillListLjq()
 	ini.GetValueOfKey(_T("PPSJ"), _T("RIGHT"), sYou);
 
 	m_mapLoc.clear();
-	char wc = 'A';
+	CString wc1 = _T("A");
+	CString wc2 = _T("B");
 
 	int iXhMark = 1;
 	m_list_Ljqxh.DeleteAllItems();
@@ -556,8 +585,16 @@ void CDlgPpsj::FillListLjq()
 		m_list_Ljqxh.SetItemText(nRow, 2, m_vecLeft[i].wzdm);
 		m_list_Ljqxh.SetItemText(nRow, 3, sXhMark);
 		iXhMark++;
-		m_mapLoc.insert(pair<CString, char>(sWz, wc));
-		wc++;
+		if (iXhMark==2)
+		{
+			m_mapLoc.insert(pair<CString, CString>(sWz, wc1));
+		}
+		if (iXhMark>2)
+		{
+			CString sTemp;
+			sTemp.Format(_T("%d"), iXhMark - 2);
+			m_mapLoc.insert(pair<CString, CString>(sWz, wc2+sTemp));
+		}
 	}
 	int nCount = m_list_Ljqxh.GetItemCount();
 	for (int j = 0; j < m_vecRight.size();j++)
@@ -574,8 +611,16 @@ void CDlgPpsj::FillListLjq()
 		m_list_Ljqxh.SetItemText(nRow, 2, m_vecRight[j].wzdm);
 		m_list_Ljqxh.SetItemText(nRow, 3, sXhMark);
 		iXhMark++;
-		m_mapLoc.insert(pair<CString, char>(sWz, wc));
-		wc++;
+		if (iXhMark == 2)
+		{
+			m_mapLoc.insert(pair<CString, CString>(sWz, wc1));
+		}
+		if (iXhMark > 2)
+		{
+			CString sTemp;
+			sTemp.Format(_T("%d"), iXhMark - 2);
+			m_mapLoc.insert(pair<CString, CString>(sWz, wc2 + sTemp));
+		}
 	}
 }
 
@@ -712,16 +757,16 @@ BOOL CDlgPpsj::GetDljxbInfo()
 				iMark2++;
 			}
 		}
-		map<CString,char>::iterator itr=m_mapLoc.find(LOC1);
+		map<CString,CString>::iterator itr=m_mapLoc.find(LOC1);
 		if (itr!=m_mapLoc.end())
 		{
-			char c1 = itr->second;
+			CString c1 = itr->second;
 			temp.lx = c1;
 		}	
-		map<CString, char>::iterator itr2 = m_mapLoc.find(LOC2);
+		map<CString, CString>::iterator itr2 = m_mapLoc.find(LOC2);
 		if (itr2!=m_mapLoc.end())
 		{
-			char c2 = itr2->second;
+			CString c2 = itr2->second;
 			temp.qx = c2;
 		}
 		
@@ -740,6 +785,19 @@ BOOL CDlgPpsj::GetDljxbInfo()
 	return TRUE;
 }
 
+bool CDlgPpsj::JudgeCreatJxb(CString sName)
+{
+	if (sName==_T("射频单根"))
+	{
+		return false;
+	}
+	if (sName == _T("射频单根连号"))
+	{
+		return false;
+	}
+	return true;
+}
+
 BOOL CDlgPpsj::CreatDljxb(AcGePoint3d ptInsert)
 {
 	UpdateData(TRUE);
@@ -748,6 +806,8 @@ BOOL CDlgPpsj::CreatDljxb(AcGePoint3d ptInsert)
 	{
 		return FALSE;
 	}
+
+	CTextUtil::AddText(offsetPoint(ptInsert, -170, -69), _T("接线表"), AcDbObjectId::kNull, 5);
 
 	AcDbTable *pTable = new AcDbTable;
 	AcDbDictionary *pDict = NULL;
@@ -796,9 +856,9 @@ BOOL CDlgPpsj::CreatDljxb(AcGePoint3d ptInsert)
 	for (int i = 0; i < iLen; i++)
 	{
 		pTable->setTextString(i + 2, 0, m_vecTabInfo[i].xxh);
-		pTable->setTextString(i + 2, 1, m_vecTabInfo[i].lx);
+		pTable->setTextString(i + 2, 1, m_vecTabInfo[i].lx+_T("端"));
 		pTable->setTextString(i + 2, 2, m_vecTabInfo[i].zjh1);
-		pTable->setTextString(i + 2, 3, m_vecTabInfo[i].qx);
+		pTable->setTextString(i + 2, 3, m_vecTabInfo[i].qx+_T("端"));
 		pTable->setTextString(i + 2, 4, m_vecTabInfo[i].zjh2);
 		pTable->setTextString(i + 2, 5, m_vecTabInfo[i].xx);
 		pTable->setTextString(i + 2, 6, m_vecTabInfo[i].cd);
@@ -944,6 +1004,7 @@ BOOL CDlgPpsj::CreatLjqDwg(CString sLocation, AcGePoint3d ptInsert,int &iMark)
 
 				FjMark markTemp;
 				CString sWh;
+				iMark = i + 1;
 				sWh.Format(_T("%d"), iMark);
 				iMark++;
 				markTemp.WH = sWh;
@@ -1032,11 +1093,11 @@ BOOL CDlgPpsj::CreatDlYzb(CString sYzbName,BOOL bLh,AcGePoint3d ptInsert)
 	if (bLh)
 	{
 		CBlockUtil::SetBlockRefAttribute(pRef, _T("代号1"), m_sW, COLOR);
-		CBlockUtil::SetBlockRefAttribute(pRef, _T("电缆编号1"), m_sBm, COLOR);
+		CBlockUtil::SetBlockRefAttribute(pRef,25, _T("电缆编号1"), m_sBm, COLOR);
 		CBlockUtil::SetBlockRefAttribute(pRef, _T("代号2"), m_sW, COLOR);
-		CBlockUtil::SetBlockRefAttribute(pRef, _T("电缆编号2"), m_sBm, COLOR);
+		CBlockUtil::SetBlockRefAttribute(pRef,25, _T("电缆编号2"), m_sBm, COLOR);
 		CBlockUtil::SetBlockRefAttribute(pRef, _T("代号3"), m_sW, COLOR);
-		CBlockUtil::SetBlockRefAttribute(pRef, _T("电缆编号3"), m_sBm, COLOR);
+		CBlockUtil::SetBlockRefAttribute(pRef,25, _T("电缆编号3"), m_sBm, COLOR);
 
 		int iMark = 1;
 		for (int i = 0; i < m_vecLeft.size(); i++)
@@ -1051,11 +1112,11 @@ BOOL CDlgPpsj::CreatDlYzb(CString sYzbName,BOOL bLh,AcGePoint3d ptInsert)
 			CString sWh3 = _T("3-") + sI + _T("端位号");//不同端的位号标识
 			CString sBh3 = _T("3-电缆编号-") + sI;//不同端的电缆编号
 			CBlockUtil::SetBlockRefAttribute(pRef, sWh, temp.wh, COLOR);
-			CBlockUtil::SetBlockRefAttribute(pRef, sBh, temp.dybs, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef, sBh, m_sW/*temp.dybs*/, COLOR);
 			CBlockUtil::SetBlockRefAttribute(pRef, sWh2, temp.wh, COLOR);
-			CBlockUtil::SetBlockRefAttribute(pRef, sBh2, temp.dybs, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef, sBh2, m_sW/*temp.dybs*/, COLOR);
 			CBlockUtil::SetBlockRefAttribute(pRef, sWh3, temp.wh, COLOR);
-			CBlockUtil::SetBlockRefAttribute(pRef, sBh3, temp.dybs, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef, sBh3, m_sW/*temp.dybs*/, COLOR);
 			iMark++;
 		}
 		for (int i = 0; i < m_vecRight.size(); i++)
@@ -1070,18 +1131,18 @@ BOOL CDlgPpsj::CreatDlYzb(CString sYzbName,BOOL bLh,AcGePoint3d ptInsert)
 			CString sWh3 = _T("3-") + sI + _T("端位号");//不同端的位号标识
 			CString sBh3 = _T("3-电缆编号-") + sI;//不同端的电缆编号
 			CBlockUtil::SetBlockRefAttribute(pRef, sWh, temp.wh, COLOR);
-			CBlockUtil::SetBlockRefAttribute(pRef, sBh, temp.dybs, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef, sBh, m_sW/*temp.dybs*/, COLOR);
 			CBlockUtil::SetBlockRefAttribute(pRef, sWh2, temp.wh, COLOR);
-			CBlockUtil::SetBlockRefAttribute(pRef, sBh2, temp.dybs, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef, sBh2, m_sW/*temp.dybs*/, COLOR);
 			CBlockUtil::SetBlockRefAttribute(pRef, sWh3, temp.wh, COLOR);
-			CBlockUtil::SetBlockRefAttribute(pRef, sBh3, temp.dybs, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef, sBh3, m_sW/*temp.dybs*/, COLOR);
 			iMark++;
 		}
 	}
 	else
 	{
-		CBlockUtil::SetBlockRefAttribute(pRef, _T("代号"), m_sBm, COLOR);
-		CBlockUtil::SetBlockRefAttribute(pRef, _T("电缆编号"), m_sW, COLOR);
+		CBlockUtil::SetBlockRefAttribute(pRef,40, _T("代号"), m_sBm, COLOR);
+		CBlockUtil::SetBlockRefAttribute(pRef,25, _T("电缆编号"), m_sW, COLOR);
 
 		int iMark = 1;
 		for (int i = 0; i < m_vecLeft.size(); i++)
@@ -1091,8 +1152,8 @@ BOOL CDlgPpsj::CreatDlYzb(CString sYzbName,BOOL bLh,AcGePoint3d ptInsert)
 			sI.Format(_T("%d"), iMark);
 			CString sWh = sI + _T("端位号");//不同端的位号标识
 			CString sBh = _T("电缆编号-") + sI;//不同端的电缆编号
-			CBlockUtil::SetBlockRefAttribute(pRef, sWh, temp.wh, COLOR);
-			CBlockUtil::SetBlockRefAttribute(pRef, sBh, temp.dybs, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef,15, sWh, temp.wh, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef,18,sBh, m_sW/*temp.dybs*/, COLOR);//打印标识修改为电缆编号
 			iMark++;
 		}
 		for (int i = 0; i < m_vecRight.size(); i++)
@@ -1102,13 +1163,75 @@ BOOL CDlgPpsj::CreatDlYzb(CString sYzbName,BOOL bLh,AcGePoint3d ptInsert)
 			sI.Format(_T("%d"), iMark);
 			CString sWh = sI + _T("端位号");//不同端的位号标识
 			CString sBh = _T("电缆编号-") + sI;//不同端的电缆编号
-			CBlockUtil::SetBlockRefAttribute(pRef, sWh, temp.wh, COLOR);
-			CBlockUtil::SetBlockRefAttribute(pRef, sBh, temp.dybs, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef,15, sWh, temp.wh, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef,18, sBh, m_sW/*temp.dybs*/, COLOR);
 			iMark++;
 		}
 	}	
 	pRef->close();
 
+	return TRUE;
+}
+
+BOOL CDlgPpsj::CreatLhDlYzb(CString sYzbName, CString sYzbUnitName, BOOL bLh, AcGePoint3d ptInsert)
+{
+	AcDbObjectId idDef = CBlockUtil::CopyBlockDefFromOtherDwg(GetDwgPath(), sYzbName);
+	AcDbObjectId idDefUnit = CBlockUtil::CopyBlockDefFromOtherDwg(GetDwgPath(), sYzbUnitName);
+	if (idDef == AcDbObjectId::kNull||idDefUnit==AcDbObjectId::kNull)
+	{
+		CString sPrompt;
+		sPrompt.Format(_T("未找到印字表图块:%s,及印子表单元图框:%s"), sYzbName,sYzbUnitName);
+		AfxMessageBox(sPrompt);
+		return FALSE;
+	}
+	//表头图块添加
+	AcGePoint3d ptYzb = AcGePoint3d(ptInsert.x + 30, ptInsert.y - 72, 0);
+	AcDbObjectId idBlock = CBlockUtil::InsertBlockRefWithAttribute(idDef, ptYzb);
+	AcGePoint3d ptYzbUnit = AcGePoint3d(ptYzb.x, ptYzb.y - 12.836, 0);
+	if (bLh)
+	{
+		for (int i = 0; i < m_nLhCableNum;i++)
+		{
+			AcDbObjectId idTemp = CBlockUtil::InsertBlockRefWithAttribute(idDefUnit, ptYzbUnit);
+			double dHight = GetBlockHight(idTemp);
+			ptYzbUnit = offsetPoint(ptYzbUnit, 0, -dHight);
+			AcDbBlockReference *pRef = NULL;
+			Acad::ErrorStatus es;
+			es = acdbOpenObject(pRef, idTemp, AcDb::kForWrite);
+			if (es != eOk)
+			{
+				AfxMessageBox(_T("打开印字表单元图块失败"));
+				return FALSE;
+			}
+			int iMark = 1;
+			CBlockUtil::SetBlockRefAttribute(pRef, 40, _T("代号"), m_sBm, COLOR);
+			CBlockUtil::SetBlockRefAttribute(pRef, 25, _T("电缆编号"), m_sW, COLOR);
+
+			for (int i = 0; i < m_vecLeft.size(); i++)
+			{
+				dlljqInfo temp = m_vecLeft[i];
+				CString sI;
+				sI.Format(_T("%d"), iMark);
+				CString sWh = sI + _T("端位号");//不同端的位号标识
+				CString sBh = _T("电缆编号-") + sI;//不同端的电缆编号
+				CBlockUtil::SetBlockRefAttribute(pRef,15, sWh, temp.wh, COLOR);
+				CBlockUtil::SetBlockRefAttribute(pRef,15, sBh, m_sW/*temp.dybs*/, COLOR);//打印标识修改为电缆编号
+				iMark++;
+			}
+			for (int i = 0; i < m_vecRight.size(); i++)
+			{
+				dlljqInfo temp = m_vecRight[i];
+				CString sI;
+				sI.Format(_T("%d"), iMark);
+				CString sWh = sI + _T("端位号");//不同端的位号标识
+				CString sBh = _T("电缆编号-") + sI;//不同端的电缆编号
+				CBlockUtil::SetBlockRefAttribute(pRef,15, sWh, temp.wh, COLOR);
+				CBlockUtil::SetBlockRefAttribute(pRef,15, sBh, m_sW/*temp.dybs*/, COLOR);
+				iMark++;
+			}
+			pRef->close();
+		}
+	}
 	return TRUE;
 }
 
@@ -1144,11 +1267,15 @@ void CDlgPpsj::OnBnClickedOk()
 	GetDlgItemText(IDC_CMB_DLLX, sDllx);
 	GetDlgItemText(IDC_CMB_DLLJ, sDlljxs);
 	CString sBlockName=sDllx+sDlljxs;
+
+
 	CString sYzbName = sBlockName + _T("-印字表");//根据电缆名称获得印字表名称
+	CString sYzbUnitName = sYzbName + UNIT;
 	if (m_bLh)
 	{
 		sBlockName += _T("连号");
 		sYzbName += _T("-连号");
+		sYzbUnitName += _T("-连号");
 	}
 
 // 	AcDbObjectId idBlockDef=CBlockUtil::CopyBlockDefFromOtherDwg(GetDwgPath(), sBlockName);
@@ -1156,10 +1283,20 @@ void CDlgPpsj::OnBnClickedOk()
 
 	CreatDlDwg(sBlockName, pt);//绘制电缆图
 
-	GetDljxbInfo();//电缆接线表信息提取
-	CreatDljxb(pt);//电缆接线表生成
-
-	CreatDlYzb(sYzbName,m_bLh,pt);
+	if (JudgeCreatJxb(sBlockName))//通过名称判断是否需要生成接线表
+	{
+		GetDljxbInfo();//电缆接线表信息提取
+		CreatDljxb(pt);//电缆接线表生成
+	}
+	if (!m_bLh)
+	{
+		CreatDlYzb(sYzbName, m_bLh, pt);
+	}
+	if (m_bLh)
+	{
+		CreatLhDlYzb(sYzbName, sYzbUnitName, m_bLh, pt);
+	}
+	
 	
     SetDataBaseXdata(_T("BM"), m_sBm);
 	CIniFile ini(GetIniPath());
