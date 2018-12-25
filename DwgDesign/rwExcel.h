@@ -49,6 +49,7 @@ public:
 	double GetValue(int x, int y);
 
 	void InsertRow(int nRow);
+	void InsertRow(CString strBegin, CString strEnd, long nStart);
 	void SaveAs(CString filename);
 	void SaveAs(CString path, CString filename);
 	void Quit(void);

@@ -5,7 +5,6 @@
 ***POP101
 **DRAWING
 ID_DRAW [快速设计]
-ID_S20[视图设置]^C^C_ST
 ID_S21[接线图]^C^C_JXT
 ID_S22[电缆图]^C^C_DLT
 [--]
@@ -18,7 +17,6 @@ ID_S25[技术文字]^C^C_JSWZ2
 ***TOOLBARS
 **BUTTON
 ID_BTN_1    [_Toolbar("按钮栏", _Left, _Show, 0, 0, 1)]
-ID_P01      [_Button("接线图","bmp/F.bmp", "ICON_29_BLANK")]^C^C_ST
 ID_P01      [_Button("接线图","bmp/A.bmp", "ICON_24_BLANK")]^C^C_JXT
 ID_P02      [_Button("电缆图","bmp/B.bmp", "ICON_25_BLANK")]^C^C_DLT
 [--]

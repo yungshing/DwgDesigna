@@ -40,8 +40,12 @@
 #include "WordEdit.h"
 #include <atlbase.h>
 #include "DlgProresstest.h"
+#include "Common/IniFile.h"
+
+bool bEnableFunction;
 
 extern CDlgMain *pDlg;
+extern CDlgPpsj *pDlgPpsj;
 extern CDlgViewSet *pSetViewDlg;
 extern CDlgAccessory *pDlgAccessory;
 extern CDlgSelectItem *pDlgSelect;
@@ -101,6 +105,11 @@ public:
 		// TODO: Add your initialization code here
 // 		CDoubleClick *pDouble = new CDoubleClick;
 // 		AcDbBlockReference::desc()->addX(AcDbDoubleClickEdit::desc(), pDouble);
+
+		
+		CIniFile ini(GetIniPath());
+		ini.GetValueOfKey(_T("PPSJ"), _T("ENABLEFUNCTION"), bEnableFunction);
+
 		LoadDwgEnvironment();
 
 		return (retCode) ;
@@ -113,6 +122,12 @@ public:
 			pDlg->DestroyWindow();
 			delete pDlg;
 			pDlg = NULL;
+		}
+		if (pDlgPpsj!=NULL)
+		{
+			pDlgPpsj->DestroyWindow();
+			delete pDlgPpsj;
+			pDlgPpsj = NULL;
 		}
 		if (pDlgAccessory!=NULL)
 		{
@@ -143,12 +158,51 @@ public:
 
 	static void Cmds_Test()
 	{
-		AcDbEntity *pEnt = NULL;
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
+		AcDbEntity *pEnt2 = NULL;
 		AcGePoint3d pickpoint;
-		CSelectUtil::PromptSelectEntity(_T("xuanze"), AcDbBlockReference::desc(), pEnt, pickpoint);
-		AcDbObjectId idTemp = pEnt->id();
-		pEnt->close();
-		MirrorBlock(idTemp);
+		CSelectUtil::PromptSelectEntity(_T("xuanze"), AcDbBlockReference::desc(), pEnt2, pickpoint);
+		AcDbObjectId idTemp = pEnt2->id();
+		pEnt2->close();
+
+		AcDbEntity *pEnt = NULL;
+		Acad::ErrorStatus es;
+		es = acdbOpenAcDbEntity(pEnt, idTemp, AcDb::kForWrite);
+		if (es != eOk)
+		{
+			return;
+		}
+		if (!pEnt->isKindOf(AcDbBlockReference::desc()))
+		{
+			pEnt->close();
+			return;
+		}
+		AcDbBlockReference *pRef = static_cast<AcDbBlockReference*>(pEnt);
+		AcDbVoidPtrArray Arr = NULL;
+		es = pRef->explode(Arr);
+		for (int i = 0; i < Arr.length(); i++)
+		{
+			AcDbEntity *pEnt = static_cast<AcDbEntity*>(Arr[i]);
+			if (pEnt->isKindOf(AcDbText::desc()))
+			{
+				AcDbText *pText = static_cast<AcDbText*>(pEnt);
+				ACHAR* chr = pText->textString();
+				CString sChr;
+				sChr.Format(_T("%s"), chr);
+				CString sCount;
+				sCount.Format(_T("%d"), 10);
+				sChr.Replace(_T("n"), sCount);
+				pText->setTextString(sChr);
+			}
+			CDwgDatabaseUtil::PostToModelSpace(pEnt);
+		}
+		pRef->erase();
+		pRef->close();
+//		MirrorBlock(idTemp);
 
 // 		CAcModuleResourceOverride rs;
 // 		CDlgSelectItem dlg(100);
@@ -208,12 +262,23 @@ public:
 
 	static void Cmds_Test2()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		SelectExcelCell(_T("C:\\Users\\66409\\Desktop\\层级+MS关系测试文件20180806\\电气特性表.xlsx"), _T("A0(X3)"), 4, 4);
 	}
 
 	static void Cmds_JXT()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		//接线图生成功能
+		UsageReat(_T("JXT"), _T(""));
 		CAcModuleResourceOverride rs;
 
 		if (pDlg == NULL)
@@ -253,14 +318,42 @@ public:
 
 	static void Cmds_DLT()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		//电缆图
-		CAcModuleResourceOverride rs;
-		CDlgPpsj dlg;
-		dlg.DoModal();
+		UsageReat(_T("DLT"), _T(""));
+
+ 		CAcModuleResourceOverride rs;
+		if (pDlgAccessory == NULL)
+		{
+			pDlgAccessory = new CDlgAccessory(acedGetAcadFrame());
+			pDlgAccessory->Create(IDD_DLG_ACCESSORY);
+		}
+		if (pDlgPpsj==NULL)
+		{
+			pDlgPpsj = new CDlgPpsj(acedGetAcadFrame());
+			pDlgPpsj->Create(IDD_DLG_PPSJ);
+			pDlgPpsj->ShowWindow(SW_SHOW);
+		}
+		else
+		{
+			pDlgPpsj->ShowWindow(SW_SHOW);
+		}
+// 		CDlgPpsj dlg;
+// 		dlg.DoModal();
+		
 	}
 
 	static void Cmds_FJ()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		CAcModuleResourceOverride rs;
 		if (pDlgAccessory==NULL)
 		{
@@ -276,6 +369,11 @@ public:
 
 	static void Cmds_WJ()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		AcGePoint3d ptStr, ptMid, ptEnd;
 		AcDbObjectId idLine,idLine2;
 		bool b;
@@ -326,6 +424,11 @@ public:
 
 	static void Cmds_TK2()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		CAcModuleResourceOverride rs;
 		CDlgFrame dlg;
 		dlg.DoModal();
@@ -333,6 +436,11 @@ public:
 
 	static void Cmds_JSWZ2()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		CAcModuleResourceOverride rs;
 		CDlgJswz dlg;
 		dlg.DoModal();
@@ -340,6 +448,11 @@ public:
 
 	static void Cmds_Ww()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		CAcModuleResourceOverride rs;
 		CDlDwg dlg;
 		dlg.DoModal();
@@ -347,6 +460,11 @@ public:
 
 	static void Cmds_Ee()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		CAcModuleResourceOverride rs;
 		CDlgAutoCreat dlg;
 		dlg.DoModal();
@@ -360,6 +478,11 @@ public:
 
 	static void Cmds_Rr()
 	{
+		if (!bEnableFunction)
+		{
+			AfxMessageBox(_T("此功能已锁定！"));
+			return;
+		}
 		std::vector<DLinfo> vecInfo;
 		AcDbObjectIdArray idArr = CDwgDatabaseUtil::GetAllEntityIds();
 		int iLen = idArr.length();

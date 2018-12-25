@@ -37,6 +37,12 @@ LRESULT CDlgProresstest::OnAcadKeepFocus(WPARAM, LPARAM) {
 
 void CDlgProresstest::setpos(int nPos)
 {
+	MSG msg;
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 	m_progress.SetPos(nPos);
 }
 

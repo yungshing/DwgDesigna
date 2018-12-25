@@ -6,6 +6,7 @@
 #include "rwExcel.h"
 #include <algorithm>
 #include "DlgProresstest.h"
+#include <CPPAdapter.h>
 
 // CDlgAccessory 对话框
 struct FjInfo
@@ -35,7 +36,9 @@ struct FjMark
 	CString GGXH;//规格
 	bool operator<(const FjMark b) const
 	{
-		return this->WH < b.WH;
+		int iWh1 = _wtoi(WH);
+		int iWh2 = _wtoi(b.WH);
+		return iWh1 < iWh2;
 	}
 	bool operator==(const FjMark b) const
 	{
@@ -43,35 +46,11 @@ struct FjMark
 	}
 	FjMark operator+(const FjMark b)
 	{	
-		CString sSlAll;
-		if (this->DW==_T("m"))
-		{
-			if (this->SL==_T("*")||b.SL==_T("*"))
-			{
-				sSlAll = _T("*");
-			}
-			else
-			{
-				double dSl = _wtof(this->SL);
-				double dSl2 = _wtof(b.SL);
-				double dSlAll = dSl + dSl2;
-				sSlAll.Format(_T("%.2f"), dSlAll);
-			}		
-		}
-		else
-		{
-			if (this->SL == _T("*") || b.SL == _T("*"))
-			{
-				sSlAll = _T("*");
-			}
-			else
-			{
-				int iSl = _wtoi(this->SL);
-				int iSl2 = _wtoi(b.SL);
-				int iSlAll = iSl + iSl2;
-				sSlAll.Format(_T("%d"), iSlAll);
-			}		
-		}
+		CString sSlAll;	
+	    double dSl = _wtof(this->SL);
+	    double dSl2 = _wtof(b.SL);
+	    double dSlAll = dSl + dSl2;
+	    sSlAll.Format(_T("%.2f"), dSlAll);
 		this->SL = sSlAll;
 		return *this;
 	}
@@ -136,11 +115,13 @@ public:
 	std::vector<FjMark> m_vec_Yxfj;//已选附件存储
 	int m_iCurrentSelect;
 
+	CString GetWzdmNum(CString sWzdm);//从界面中list中获取对应物资代码数量
+
 	BOOL GetFjInfo(CString sExcelPath);
 	BOOL RefreshLisht();
 
-	void DrawPoly(AcGePoint3d pt1, AcGePoint3d pt2, AcGePoint3d pt3);
-	void DrawPoly(AcGePoint3d pt1, AcGePoint3d pt2, AcGePoint3d pt3, AcGePoint3d pt4);
+	AcDbPolyline* DrawPoly(AcGePoint3d pt1, AcGePoint3d pt2, AcGePoint3d pt3);
+	AcDbPolyline* DrawPoly(AcGePoint3d pt1, AcGePoint3d pt2, AcGePoint3d pt3, AcGePoint3d pt4);
 	void DrawFjMark(FjMark markInfo,AcGePoint3d ptInsert);
 	void GetFjmxbInfo();
 	BOOL CreatFjmxb(CString sSaveExcelPath);

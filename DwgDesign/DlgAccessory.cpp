@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "DlgAccessory.h"
 #include "afxdialogex.h"
+#include "DlgPpsj.h"
 
 extern bool strdlg();
 extern bool deletedlg();
@@ -17,7 +18,7 @@ IMPLEMENT_DYNAMIC(CDlgAccessory, CDialogEx)
 CDlgAccessory::CDlgAccessory(CWnd* pParent /*=NULL*/)
 : CDialogEx(CDlgAccessory::IDD, pParent)
 {
-	m_sNum = _T("*");
+	m_sNum = _T("");
 	m_bRU = TRUE;
 	m_bRD = FALSE;
 	m_bLD = FALSE;
@@ -127,11 +128,35 @@ void CDlgAccessory::PostNcDestroy()
 	CDialogEx::PostNcDestroy();
 }
 
+extern CDlgPpsj *pDlgPpsj;
+
 void CDlgAccessory::OnClose()
 {
 	// TODO:  在此添加消息处理程序代码和/或调用默认值
 	CDialogEx::OnClose();
-	DestroyWindow();
+//	DestroyWindow();
+
+	acDocManager->lockDocument(curDoc());
+	CString sBm = GetDwgBm();
+	acDocManager->unlockDocument(curDoc());
+	if (pDlgPpsj!=NULL)
+	{
+		if (pDlgPpsj->m_bWlpp)
+		{
+			UsageReat(_T("DLLJGXB"), _T(""));
+			const wchar_t* exist = _T("");
+			exist = sBm;
+			wchar_t excelpath[260]; /*= GetBatchDesignFoldPath();*/
+			DWORD ret = glaway::BatchCableDesign(m_hWnd, exist, excelpath);
+			if (ret == NO_ERROR)
+			{
+				pDlgPpsj->m_sDlljgxb = excelpath;
+				pDlgPpsj->UpdateData(FALSE);
+				pDlgPpsj->ShowWindow(SW_SHOW);
+				pDlgPpsj->doParseExcel();
+			}
+		}
+	}
 }
 
 BOOL CDlgAccessory::PreTranslateMessage(MSG* pMsg)
@@ -179,6 +204,22 @@ BOOL CDlgAccessory::OnInitDialog()
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常:  OCX 属性页应返回 FALSE
+}
+
+CString CDlgAccessory::GetWzdmNum(CString sWzdm)
+{
+	int iCount = 0;
+	for (int i = 0; i < m_listFj.GetItemCount();i++)
+	{
+		CString wzdmTemp=m_listFj.GetItemText(i, 1);
+		if (wzdmTemp==sWzdm)
+		{
+			iCount++;
+		}
+	}
+	CString sI;
+	sI.Format(_T("%d"), iCount);
+	return sI;
 }
 
 BOOL CDlgAccessory::GetFjInfo(CString sExcelPath)
@@ -273,23 +314,23 @@ BOOL CDlgAccessory::RefreshLisht()
 	return TRUE;
 }
 
-void CDlgAccessory::DrawPoly(AcGePoint3d pt1, AcGePoint3d pt2, AcGePoint3d pt3)
+AcDbPolyline* CDlgAccessory::DrawPoly(AcGePoint3d pt1, AcGePoint3d pt2, AcGePoint3d pt3)
 {
 	AcDbPolyline *pPoly = new AcDbPolyline;
 	pPoly->addVertexAt(0, CConvertUtil::ToPoint2d(pt1));
 	pPoly->addVertexAt(1, CConvertUtil::ToPoint2d(pt2));
 	pPoly->addVertexAt(2, CConvertUtil::ToPoint2d(pt3));
-	CDwgDatabaseUtil::PostToModelSpace(pPoly);
+	return pPoly;
 }
 
-void CDlgAccessory::DrawPoly(AcGePoint3d pt1, AcGePoint3d pt2, AcGePoint3d pt3, AcGePoint3d pt4)
+AcDbPolyline* CDlgAccessory::DrawPoly(AcGePoint3d pt1, AcGePoint3d pt2, AcGePoint3d pt3, AcGePoint3d pt4)
 {
 	AcDbPolyline *pPoly = new AcDbPolyline;
 	pPoly->addVertexAt(0, CConvertUtil::ToPoint2d(pt1));
 	pPoly->addVertexAt(1, CConvertUtil::ToPoint2d(pt2));
 	pPoly->addVertexAt(2, CConvertUtil::ToPoint2d(pt3));
 	pPoly->addVertexAt(3, CConvertUtil::ToPoint2d(pt4));
-	CDwgDatabaseUtil::PostToModelSpace(pPoly);
+	return pPoly;
 }
 
 void CDlgAccessory::DrawFjMark(FjMark markInfo,AcGePoint3d ptInsert)
@@ -339,15 +380,16 @@ void CDlgAccessory::DrawFjMark(FjMark markInfo,AcGePoint3d ptInsert)
 	default:
 		break;
 	}
+	AcDbPolyline* polyEnt=NULL;
 	if (m_bConnect)
 	{
 		ptTextInsert = ptText2;
-		DrawPoly(ptInsert, pt3, pt4, pt5);
+		polyEnt = DrawPoly(ptInsert, pt3, pt4, pt5);
 	}
 	else
 	{
 		ptTextInsert = ptText;
-		DrawPoly(ptInsert, pt1, pt2);
+		polyEnt = DrawPoly(ptInsert, pt1, pt2);
 	}
 	AcDbText *pText = new AcDbText;
 	CString sWh = markInfo.WH;
@@ -355,14 +397,40 @@ void CDlgAccessory::DrawFjMark(FjMark markInfo,AcGePoint3d ptInsert)
 	pText->setWidthFactor(m_dWidthFactor);
 	pText->setHeight(m_dTextHight);
 	pText->setPosition(ptTextInsert);
-	CDwgDatabaseUtil::SetXdata(_T("元器件"), markInfo.YQJ, pText);
-	CDwgDatabaseUtil::SetXdata(_T("位号"), markInfo.WH, pText);
-	CDwgDatabaseUtil::SetXdata(_T("单位"), markInfo.DW, pText);
-	CDwgDatabaseUtil::SetXdata(_T("代号"), markInfo.DH, pText);
-	CDwgDatabaseUtil::SetXdata(_T("数量"), markInfo.SL, pText);
-	CDwgDatabaseUtil::SetXdata(_T("名称"), markInfo.MC, pText);
-	CDwgDatabaseUtil::SetXdata(_T("规格"), markInfo.GGXH, pText);
-	CDwgDatabaseUtil::PostToModelSpace(pText);
+	
+	AcDbBlockTable *pTab=NULL;
+	Acad::ErrorStatus es=acdbHostApplicationServices()->workingDatabase()->getBlockTable(pTab, AcDb::kForWrite);
+	if (es!=eOk)
+	{
+		delete pText;
+		delete polyEnt;
+		return;
+	}
+	AcDbBlockTableRecord *pRec = new AcDbBlockTableRecord;
+	pRec->setName(GetTimer());
+	pRec->appendAcDbEntity(pText);
+	pRec->appendAcDbEntity(polyEnt);
+	pRec->setOrigin(ptTextInsert);
+	
+	AcDbObjectId idRec;
+	pTab->add(idRec,pRec);
+	pTab->close();
+	pRec->close();
+	AcDbObjectId idBlock=CBlockUtil::InsertBlockRef(idRec, ptTextInsert);
+	AcDbEntity *pEnt = NULL;
+	acdbOpenAcDbEntity( pEnt, idBlock,AcDb::kForWrite);
+	CDwgDatabaseUtil::SetXdata(_T("元器件"), markInfo.YQJ, pEnt);
+	CDwgDatabaseUtil::SetXdata(_T("位号"), markInfo.WH, pEnt);
+	CDwgDatabaseUtil::SetXdata(_T("单位"), markInfo.DW, pEnt);
+	CDwgDatabaseUtil::SetXdata(_T("代号"), markInfo.DH, pEnt);
+	CDwgDatabaseUtil::SetXdata(_T("数量"), markInfo.SL, pEnt);
+	CDwgDatabaseUtil::SetXdata(_T("名称"), markInfo.MC, pEnt);
+	CDwgDatabaseUtil::SetXdata(_T("规格"), markInfo.GGXH, pEnt);
+	CDwgDatabaseUtil::SetXdata(_T("文件名"), m_sDlsjb, pEnt);
+	pEnt->close();
+// 	CString sGropuName = GetTimer();
+// 	AddObjToGroup(sGropuName, polyId);
+// 	AddObjToGroup(sGropuName, TextId);
 }
 
 void CDlgAccessory::GetFjmxbInfo()
@@ -372,8 +440,11 @@ void CDlgAccessory::GetFjmxbInfo()
 	AcDbObjectIdArray idArr = CDwgDatabaseUtil::GetAllEntityIds();
 	for (int i = 0; i < idArr.length();i++)
 	{
-		prodlg->setpos(50 / idArr.length()*(i + 1));
-		Sleep(100);
+		if (prodlg!=NULL)
+		{
+			prodlg->setpos(30 / idArr.length()*(i + 1));
+			Sleep(50);
+		}		
 
 		AcDbObjectId idTemp = idArr[i];
 		AcDbEntity *pEnt = NULL;
@@ -396,6 +467,7 @@ void CDlgAccessory::GetFjmxbInfo()
 		CDwgDatabaseUtil::getXdata(_T("规格"), GGXH, pEnt);
 		CDwgDatabaseUtil::getXdata(_T("单位"), DW, pEnt);
 		CDwgDatabaseUtil::getXdata(_T("数量"), SL, pEnt);
+//		SL = GetWzdmNum(DH);
 		FjMark temp,temp2;
 		temp.YQJ = YQJ;
 		temp.WH = WH;
@@ -408,10 +480,23 @@ void CDlgAccessory::GetFjmxbInfo()
 		if (itr!=m_vec_FjMark.end())
 		{
 			temp2 = *itr;
-			*itr = temp + temp2;
+			if (temp2.SL==_T("")||temp.SL==_T(""))
+			{
+				temp.SL = GetWzdmNum(temp.WH);
+				*itr = temp;
+			}
+			else
+			{
+				*itr = temp + temp2;
+			}
+			
 		}
 		else
 		{
+			if (temp.SL==_T(""))
+			{
+				temp.SL = GetWzdmNum(temp.WH);
+			}
 			m_vec_FjMark.push_back(temp);
 		}
 		pEnt->close();
@@ -425,7 +510,7 @@ BOOL CDlgAccessory::CreatFjmxb(CString sSaveExcelPath)
 	if (m_vec_FjMark.size()==0)
 	{
 		return FALSE;
-	}
+	}	
 	CString sExcelPath = GetExcelFjmxbPath();
 	cExcel excel;
 	if (!excel.StartApp())
@@ -434,10 +519,29 @@ BOOL CDlgAccessory::CreatFjmxb(CString sSaveExcelPath)
 		return FALSE;
 	}
 	excel.OpenWorkBook(sExcelPath);
+	//页数处理
+	int nMod = m_vec_FjMark.size() / 49;
+	int nFlagRow = 52;
+	for (int i = 0; i < nMod; i++)
+	{
+		for (int j = 0; j < 49; j++)
+		{
+			if (prodlg != NULL)
+			{
+				prodlg->setpos(30 + 40 / nMod*49*(j+1+(i + 1)*49));
+				Sleep(50);
+			}
+			excel.InsertRow(_T("A40"), _T("J40"), nFlagRow);	
+		}
+	}
+
 	for (int i = 0;i<m_vec_FjMark.size();i++)
 	{
-		prodlg->setpos(50+50 / m_vec_FjMark.size()*(i + 1));
-		Sleep(100);
+		if (prodlg!=NULL)
+		{
+			prodlg->setpos(70 + 30 / m_vec_FjMark.size()*(i + 1));
+			Sleep(50);
+		}		
 
 		FjMark temp = m_vec_FjMark[i];
 		CString sI;
@@ -667,18 +771,21 @@ void CDlgAccessory::GetYxfjInfo()
 		{
 			continue;
 		}
-		if (!pEnt->isKindOf(AcDbText::desc()))
+		if (!pEnt->isKindOf(AcDbBlockReference::desc()))
 		{
 			pEnt->close();
 			continue;
 		}
 		CString sYqj,sWh, sDw, sDh, sSl, sMc, sGg;
-		CDwgDatabaseUtil::getXdata(_T("位号"), sWh, pEnt);
-		if (sWh == _T(""))
+		CString sTablePath;
+		CDwgDatabaseUtil::getXdata(_T("文件名"), sTablePath, pEnt);
+		
+		if (sTablePath == _T("")||sTablePath!=m_sDlsjb)
 		{
 			pEnt->close();
 			continue;
 		}
+		CDwgDatabaseUtil::getXdata(_T("位号"), sWh, pEnt);
 		CDwgDatabaseUtil::getXdata(_T("元器件"), sYqj, pEnt);
 		CDwgDatabaseUtil::getXdata(_T("单位"), sDw, pEnt);
 		CDwgDatabaseUtil::getXdata(_T("代号"), sDh, pEnt);

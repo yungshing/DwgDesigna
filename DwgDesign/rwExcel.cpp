@@ -542,6 +542,26 @@ void cExcel::InsertRow(int nRow)
 	rang.ReleaseDispatch();
 }
 
+void cExcel::InsertRow(CString strBegin, CString strEnd, long nStart)
+{
+	_ExRange preRange, curRange;
+	preRange.AttachDispatch(pSheet.GetRange(_variant_t(strBegin), _variant_t(strEnd)));
+	preRange.AttachDispatch(preRange.GetEntireRow(), TRUE);
+
+	strBegin.Format(_T("A%d"), nStart);
+	strEnd.Format(_T("L%d"), nStart);
+	curRange.AttachDispatch(pSheet.GetRange(_variant_t(strBegin), _variant_t(strEnd)));
+	COleVariant varRange;
+	varRange.vt = VT_DISPATCH;
+	V_DISPATCH(&varRange) = (LPDISPATCH)curRange;
+	V_DISPATCH(&varRange)->AddRef();
+	preRange.Copy(varRange);
+
+	curRange.Insert(vtMissing);
+	preRange.ReleaseDispatch();
+	curRange.ReleaseDispatch();
+}
+
 // void cExcel::SetBackColor( long color )
 // {
 // 	assert(pRange != NULL );

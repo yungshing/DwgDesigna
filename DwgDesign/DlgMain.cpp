@@ -1027,7 +1027,7 @@ void CDlgMain::OnBnClickedBtnCretejxb()
 // 		}
 // 	}
 // 	excel.Quit();
-
+	UsageReat(_T("SCDZB"), _T(""));
 	UpdateData(TRUE);
 	if (m_vecInfo.size()==0)
 	{
@@ -1114,6 +1114,7 @@ void CDlgMain::OnBnClickedBtnCretejxb()
 void CDlgMain::OnBnClickedBtnReflist()
 {
 	// TODO:  在此添加控件通知处理程序代码
+	UsageReat(_T("LJSB"), _T(""));
 	if (!CheckExcelPath(m_sJxb))
 	{
 		AfxMessageBox(_T("excel文件打开存在问题,请检查！"));
@@ -1188,6 +1189,7 @@ void CDlgMain::OnBnClickedBtnCheckinfo()
 void CDlgMain::OnBnClickedBtnTabtomark()
 {
 	// TODO:  在此添加控件通知处理程序代码
+	UsageReat(_T("WHSB"), _T(""));
 	UpdateData(TRUE);
 	if (!CheckExcelPath(m_sDqtx))
 	{
@@ -1435,10 +1437,6 @@ BOOL CDlgMain::PreTranslateMessage(MSG* pMsg)
 	{
 		return TRUE;
 	}
-// 	else if (pMsg->message == WM_KEYDOWN&&pMsg->wParam == VK_SPACE)
-// 	{
-// 		return TRUE;
-// 	}
 	else
 	{
 		return CAcUiTabMainDialog::PreTranslateMessage(pMsg);

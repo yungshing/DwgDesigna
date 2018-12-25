@@ -149,3 +149,9 @@ AcGePoint3d offsetPoint(AcGePoint3d pt, double x, double y);
 AcDbObjectId MirrorBlock(AcDbObjectId idBlock);
 
 double GetBlockHight(AcDbObjectId objId);
+
+bool AddObjToGroup(CString strLabel, AcDbObjectId objId);
+
+void UsageReat(CString sName, CString sBm = _T(""));
+
+CString GetDwgBm();//获得当前图纸BM号

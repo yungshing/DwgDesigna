@@ -1419,6 +1419,66 @@ double GetBlockHight(AcDbObjectId objId)
 	return dHight;
 }
 
+bool AddObjToGroup(CString strLabel, AcDbObjectId objId)
+{
+	AcDbDictionary *pGroupDict;
+	AcDbGroup* pGroup = NULL;
+	acdbHostApplicationServices()->workingDatabase()->getGroupDictionary(pGroupDict, AcDb::kForWrite);
+	if (pGroupDict->getAt(strLabel, (AcDbObject*&)pGroup, AcDb::kForWrite) != Acad::eOk)
+	{
+		pGroupDict->close();
+		return false;
+	}
+	pGroup->append(objId);
+	pGroup->close();
+	pGroupDict->close();
+	return true;
+}
+
+#include <Windows.h>
+void UsageReat(CString sName, CString sBm /*= _T("")*/)
+{
+	wchar_t buffer[MAX_PATH];
+	DWORD code = GetEnvironmentVariable(L"SWIEEMEMUsageRatePath", buffer, MAX_PATH);
+	if (code == 0)
+	{
+		acutPrintf(_T("\n使用次数记录失败!"));
+		return;
+	}
+	CString sParameter = sName + (sBm == _T("") ? _T("") : _T(" ") + sBm);
+	::ShellExecute(NULL, _T("open"), buffer, sParameter, NULL, SW_SHOW);
+}
+
+CString GetDwgBm()
+{
+	CString sRet = _T("");
+	AcDbObjectIdArray idArr = CDwgDatabaseUtil::GetAllEntityIds();
+	for (int i = 0; i < idArr.length();i++)
+	{
+		AcDbEntity *pEnt = NULL;
+		Acad::ErrorStatus es;
+		es = acdbOpenAcDbEntity(pEnt, idArr[i], AcDb::kForWrite);
+		if (es!=eOk)
+		{
+			continue;
+		}
+		CString sBmTemp = _T("");
+		CDwgDatabaseUtil::getXdata(ICD_DWFDESIGN_BM, sBmTemp, pEnt);
+		pEnt->close();
+		vector<CString> vecBm;
+		CStringUtil::Split(sBmTemp, _T(";"), vecBm);
+		for (int j = 0; j < vecBm.size();j++)
+		{
+			if (sRet!=_T(""))
+			{
+				sRet += _T(",");
+			}
+			sRet += vecBm[j];
+		}
+	}
+	return sRet;
+}
+
 // double OpenObjAndGetLength(AcDbObjectId objId)
 // {
 // 	double dWidth = 0.0;

@@ -225,6 +225,10 @@ void fcGsPreviewCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 void fcGsPreviewCtrl::Clear()
 {
 	AcGsManager *pGsManager = acgsGetGsManager();
+	if (pGsManager==NULL)
+	{
+		return;
+	}
 	//RXASSERT(pGsManager);
 	if (m_pView) 
 	{

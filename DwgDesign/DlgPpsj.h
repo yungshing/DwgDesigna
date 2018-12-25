@@ -32,6 +32,8 @@ struct dlljqInfo
 	CString wzdm;//物资代码
 	CString wh;//位号
 	CString dybs;//打印标识
+	CString dz;//端子
+	CString tx;//特性
 };
 
 //电缆规格信息
@@ -48,6 +50,19 @@ struct dlLocationAndName
 	CString LOCATION;
 	CString NAME;
 	CString WZDM;
+};
+
+enum CableType
+{
+	单根射频 =1,
+	集束射频,
+	集束射频n,
+	两头集束,
+	低频类型,
+	单根低频,
+	集束低频,
+	集束低频n,
+	errorType
 };
 
 class CDlgPpsj : public CDialogEx
@@ -68,15 +83,32 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-public:
-	CString m_sDlljgxb;//电缆连接关系表
-	CString m_sW;//w 设置
-	CString m_sBm;//bm 设置
+private:
+	CString m_sAlreadyExistBm;
+
+	
+
+	CString m_sW;//w 获取
+	CString m_sBm;//bm 获取
 	bool isLhCable();//判断是不是连号电缆
-	int m_nLhCableNum;
-	void getLhCableNum();
-	CString m_sDllx;
+
+	int m_nLhCableNum;//连号电缆数量
+	int m_nLjqNum;//连接器数量
+
+	void getLhCableNum();//获取连号电缆数量
+
+	bool m_bJS;//记录右端是不是大于三
+	vector<CString> m_vecLhBm;//bm号信息存储
+	vector<CString> m_vecLhW;//电缆编号信息存储
+
+	CString GetCableTypeIniPath();
+	CString m_sDllx;//电缆类型
+	CString m_sLeftWzdm, m_sRightWzdm;
+	CableType m_enmuCableType;
+	CableType GetCableType();
+	bool m_bLeftDt, m_bRightDt;//左右端的单头处理
 //	CString m_sDlgg;//电缆规格
+	CString m_sDlName; //用于记录生成的电缆名称 如低频一分三等
 
 	CAcUiComboBox m_cmb_Dllx;//电缆类型
 	CAcUiComboBox m_cmb_Dlljxs;//电缆连接形式
@@ -87,21 +119,30 @@ public:
 	CListCtrl m_list_Dlfjxx;//电缆附件信息
 	CListCtrl m_list_Dlgg;//电缆规格
 
-	map<CString, CString> m_mapLoc;
-
-	CString m_sDlName;//用于存储导入电缆中的名字
+	map<CString, CString> m_mapLoc;//位置信息存储
 
 	vector<dlljqInfo> m_vecLeft;//左端获取的信息
+	vector<CString> m_vecLeftDuanzi;//端子信息单独存储
 	vector<dlljqInfo> m_vecRight;//右端获取的信息
+	vector<CString> m_vecRightDuanzi;
+
+	vector<vector<dlljqInfo>> m_vecLhLeftAll;
+	vector<vector<dlljqInfo>> m_vecLhRightAll;
+
+
+
 	vector<dlggInfo> m_vecDlgg;//电缆规格信息
 	vector<Log> m_vecLog;//电缆匹配设计导出的问题
 
 	vector<dlLocationAndName> m_vecLocAndName;//存储位置以及名称
 
 	fcGsPreviewCtrl m_fc;
+
+
 	
 	BOOL CheckExcel();//检测excel中的错误信息
 	void GetDlInfo();//获取左端以及右端的端子名称
+	void GetNewDlInfo();
 	CString GetDlType(int iLeft, int iRight);//根据左右端的物资数量匹配出电缆类型
 	void FillListLjq();
 	void FillListDlgg();
@@ -117,26 +158,37 @@ public:
 
 	BOOL CreatLhDlYzb(CString sYzbName, CString sYzbUnitName, BOOL bLh, AcGePoint3d ptInsert);//电缆印子表 连号
 
+
+	BOOL CreatTableYzb(AcGePoint3d ptInsert,BOOL Lh);
+
 	int m_nItem;//用于操作修改edit
 	int m_nSubItem;//修改
 	CEdit m_Edit;//修改控件 
 	void ShowEdit(bool bShow, int nItem, int nSubitem, CRect rc);
 
 	BOOL CreatDlDwg(CString sBlockName,AcGePoint3d ptInsert);
+	AcDbObjectId m_idModNBloock;
+	void ExplodeRefAndModN(AcDbObjectId IdRef);
 	BOOL CreatLjqDwg(CString sLocation, AcGePoint3d ptInsert,int &iMark);
 
 	double m_dX;//绘制连线X长度
 	double m_dY;//绘制连线Y长度
 	double m_dLen;//水平长度
 
-	void CreatMark(FjMark temp,AcGePoint3d ptInsert);
+	void CreatMark(FjMark temp,AcGePoint3d ptInsert,CString sMark);
 
 	CString DisposeBlockName(CString sName);
 private:
 	std::vector<dljxbInfo> m_vecTabInfo;
 	CRect m_rect;//存储初始化控件大小
 public:
+	bool m_bWlpp;//物料匹配
+	CString m_sDlljgxb;//电缆连接关系表
+	void doParseExcel();
+	void setAlreadyExistBm(CString sAlExBm);
 	virtual BOOL OnInitDialog();
+	afx_msg LRESULT OnACADKeepFocus(WPARAM, LPARAM);
+	BOOL keepTheFocus();
 	afx_msg void OnBnClickedBtnSearch1();
 	afx_msg void OnBnClickedBtnSearch3();
 	afx_msg void OnBnClickedBtnSelect();
@@ -157,4 +209,8 @@ public:
 	afx_msg void OnBnClickedBtnHbtab();
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButtonConnectselect();
+//	afx_msg void OnNcDestroy();
+	virtual void PostNcDestroy();
+	afx_msg void OnClose();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

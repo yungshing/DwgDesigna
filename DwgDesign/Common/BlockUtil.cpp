@@ -248,7 +248,10 @@ bool CBlockUtil::SetBlockRefAttribute(AcDbBlockReference *pBlkRef, double dTextL
 									pAtt->getGeomExtents(exts);
 									double dWtemp = abs(exts.minPoint().x - exts.maxPoint().x);
 									double dwidthfactor = dTextLen / dWtemp;
-									pAtt->setWidthFactor(dwidthfactor);
+									if (dwidthfactor<1)
+									{
+										pAtt->setWidthFactor(dwidthfactor);
+									}									
 									/////////////////
 									bFound = true;
 								}

@@ -33,6 +33,10 @@
 //-----------------------------------------------------------------------------
 #define STRICT
 
+#define ICD_DWGDESIGN_DP             _T("µÕ∆µ")
+#define ICD_DWGDESIGN_SP             _T("…‰∆µ")
+#define ICD_DWFDESIGN_BM             _T("bm∫≈")
+
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN			//- Exclude rarely-used stuff from Windows headers
 #endif
